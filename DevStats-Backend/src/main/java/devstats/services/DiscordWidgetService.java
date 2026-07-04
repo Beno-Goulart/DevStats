@@ -21,22 +21,34 @@ public class DiscordWidgetService {
     private static final String API = "https://discord.com/api/v9";
     private static final int TEXT_FIELD_TYPE = 1;
     private static final int IMAGE_FIELD_TYPE = 2;
+    private static final String FIELD_FULL_NAME = "full_name";
+    private static final String FIELD_ROLE = "role";
+    private static final String FIELD_PROFILE_IMAGE = "profile_img";
+    private static final String FIELD_LANGUAGE = "language";
+    private static final String FIELD_COMMITS = "commits";
+    private static final String FIELD_LAST_COMMIT = "last_commit";
+    private static final String FIELD_LAST_REPOSITORY = "last_repo";
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
     public void sync(GithubProfile profile) throws Exception {
 
-        updateProfile(profile);
+        syncProfile(profile);
 
     }
 
-    public void updateProfile(GithubProfile profile) throws Exception {
+    public void syncProfile(GithubProfile profile) throws Exception {
 
         WidgetPayload payload = buildPayload(profile);
         String json = mapper.writeValueAsString(payload);
 
         HttpResponse<String> response = sendPatch(json);
+        System.out.println(json);
+
+        System.out.println(response.statusCode());
+
+        System.out.println(response.body());
         validateResponse(response);
 
     }
@@ -56,13 +68,13 @@ public class DiscordWidgetService {
 
         List<DynamicField> fields = new ArrayList<>();
 
-        fields.add(textField("full_name", profile.getFullName()));
-        fields.add(textField("role", profile.getBio()));
-        fields.add(imageField("profile_img", profile.getAvatarUrl()));
-        fields.add(textField("language", profile.getMainLanguage()));
-        fields.add(textField("commits", String.valueOf(profile.getCommits())));
-        fields.add(textField("last_commit", profile.getLastCommit()));
-        fields.add(textField("last_repo", profile.getLastRepository()));
+        fields.add(textField(FIELD_FULL_NAME, profile.getFullName()));
+        fields.add(textField(FIELD_ROLE, profile.getBio()));
+        fields.add(imageField(FIELD_PROFILE_IMAGE, profile.getAvatarUrl()));
+        fields.add(textField(FIELD_LANGUAGE, profile.getMainLanguage()));
+        fields.add(textField(FIELD_COMMITS, String.valueOf(profile.getCommits())));
+        fields.add(textField(FIELD_LAST_COMMIT, profile.getLastCommit()));
+        fields.add(textField(FIELD_LAST_REPOSITORY, profile.getLastRepository()));
 
         return fields;
 

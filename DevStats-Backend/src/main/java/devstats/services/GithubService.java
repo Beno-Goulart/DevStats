@@ -28,21 +28,21 @@ public class GithubService {
 
         GithubProfile profile = new GithubProfile();
 
-        JsonNode user = getJson("/users/" + path(Config.GITHUB_USERNAME));
+        JsonNode user = getJsonNode("/users/" + encodePathSegment(Config.GITHUB_USERNAME));
 
-        profile.setUsername(text(user, "login"));
-        profile.setFullName(text(user, "name"));
-        profile.setBio(text(user, "bio"));
-        profile.setAvatarUrl(text(user, "avatar_url"));
+        profile.setUsername(textField(user, "login"));
+        profile.setFullName(textField(user, "name"));
+        profile.setBio(textField(user, "bio"));
+        profile.setAvatarUrl(textField(user, "avatar_url"));
         profile.setStreak(0);
 
-        loadRepositories(profile);
+        loadRepositoryStats(profile);
 
         return profile;
 
     }
 
-    private void loadRepositories(GithubProfile profile) throws Exception {
+    private void loadRepositoryStats(GithubProfile profile) throws Exception {
 
         Map<String, Long> languageBytes = new HashMap<>();
         JsonNode latestRepository = null;
@@ -51,9 +51,9 @@ public class GithubService {
 
         while (true) {
 
-            JsonNode repositories = getJson(
+            JsonNode repositories = getJsonNode(
                     "/users/" +
-                            path(Config.GITHUB_USERNAME) +
+                            encodePathSegment(Config.GITHUB_USERNAME) +
                             "/repos?per_page=" +
                             REPOSITORIES_PER_PAGE +
                             "&page=" +
@@ -70,7 +70,7 @@ public class GithubService {
 
                 if (
                         latestRepository == null ||
-                                text(repository, "updated_at").compareTo(text(latestRepository, "updated_at")) > 0
+                                textField(repository, "updated_at").compareTo(textField(latestRepository, "updated_at")) > 0
                 ) {
                     latestRepository = repository;
                 }
@@ -92,25 +92,25 @@ public class GithubService {
             return;
         }
 
-        profile.setLastRepository(text(latestRepository, "name"));
+        profile.setLastRepository(textField(latestRepository, "name"));
         loadCommits(profile, latestRepository);
 
     }
 
     private void addRepositoryLanguages(JsonNode repository, Map<String, Long> languageBytes) throws Exception {
 
-        String owner = text(repository.path("owner"), "login");
-        String repositoryName = text(repository, "name");
+        String owner = textField(repository.path("owner"), "login");
+        String repositoryName = textField(repository, "name");
 
         if (owner.isBlank() || repositoryName.isBlank()) {
             return;
         }
 
-        JsonNode languages = getJson(
+        JsonNode languages = getJsonNode(
                 "/repos/" +
-                        path(owner) +
+                        encodePathSegment(owner) +
                         "/" +
-                        path(repositoryName) +
+                        encodePathSegment(repositoryName) +
                         "/languages"
         );
 
@@ -126,14 +126,14 @@ public class GithubService {
 
     private void loadCommits(GithubProfile profile, JsonNode repository) throws Exception {
 
-        String owner = text(repository.path("owner"), "login");
-        String repositoryName = text(repository, "name");
+        String owner = textField(repository.path("owner"), "login");
+        String repositoryName = textField(repository, "name");
 
-        JsonNode commits = getJson(
+        JsonNode commits = getJsonNode(
                 "/repos/" +
-                        path(owner) +
+                        encodePathSegment(owner) +
                         "/" +
-                        path(repositoryName) +
+                        encodePathSegment(repositoryName) +
                         "/commits?per_page=" +
                         COMMITS_PER_PAGE
         );
@@ -144,21 +144,21 @@ public class GithubService {
         }
 
         JsonNode latestCommit = commits.get(0);
-        String message = text(latestCommit.path("commit"), "message");
+        String message = textField(latestCommit.path("commit"), "message");
 
-        profile.setLastCommit(message.isBlank() ? text(latestCommit, "sha") : message);
+        profile.setLastCommit(message.isBlank() ? textField(latestCommit, "sha") : message);
         profile.setCommits(commits.size());
 
     }
 
-    private JsonNode getJson(String path) throws Exception {
+    private JsonNode getJsonNode(String path) throws Exception {
 
-        HttpResponse<String> response = sendGet(path);
+        HttpResponse<String> response = sendGetRequest(path);
         return mapper.readTree(response.body());
 
     }
 
-    private HttpResponse<String> sendGet(String path) throws Exception {
+    private HttpResponse<String> sendGetRequest(String path) throws Exception {
 
         HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
                 .uri(URI.create(API + path))
@@ -201,14 +201,14 @@ public class GithubService {
 
     }
 
-    private String text(JsonNode node, String field) {
+    private String textField(JsonNode node, String field) {
 
         JsonNode value = node.path(field);
         return value.isMissingNode() || value.isNull() ? "" : value.asText();
 
     }
 
-    private String path(String value) {
+    private String encodePathSegment(String value) {
 
         return URLEncoder.encode(value, StandardCharsets.UTF_8).replace("+", "%20");
 
