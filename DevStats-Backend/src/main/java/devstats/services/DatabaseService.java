@@ -93,6 +93,26 @@ public class DatabaseService {
         return null;
     }
 
+    public void saveOAuthTokens(String discordId, String accessToken, String refreshToken) {
+        String sql = "INSERT INTO users (discord_id, discord_access_token, refresh_token, last_sync) " +
+                "VALUES (?, ?, ?, ?) " +
+                "ON CONFLICT(discord_id) DO UPDATE SET " +
+                "discord_access_token = excluded.discord_access_token, " +
+                "refresh_token = excluded.refresh_token, " +
+                "last_sync = excluded.last_sync;";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, discordId);
+            pstmt.setString(2, accessToken);
+            pstmt.setString(3, refreshToken);
+            pstmt.setLong(4, System.currentTimeMillis());
+            pstmt.executeUpdate();
+            System.out.println("Tokens OAuth salvos para o usuário: " + discordId);
+        } catch (SQLException e) {
+            System.err.println("Erro ao salvar tokens OAuth: " + e.getMessage());
+        }
+    }
+
     public void updateGithub(String discordId, String githubUsername) {
         String sql = "UPDATE users SET github_username = ? WHERE discord_id = ?;";
         try (Connection conn = connect();

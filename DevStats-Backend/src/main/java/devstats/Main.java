@@ -1,6 +1,7 @@
 package devstats;
 
 import devstats.commands.WidgetCommand;
+import devstats.http.OAuthServer;
 import devstats.models.Config;
 import devstats.services.DatabaseService;
 import devstats.services.DiscordWidgetService;
@@ -26,5 +27,9 @@ public class Main {
                 .build();
 
         System.out.println("DevStats Bot inicializado com sucesso!");
+
+        // Iniciar servidor HTTP para callback OAuth
+        OAuthServer oauthServer = new OAuthServer(oAuthService, databaseService);
+        oauthServer.start();
     }
 }

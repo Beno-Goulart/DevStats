@@ -44,7 +44,7 @@ public class WidgetRefreshCommand {
                                 .queue();
                     } catch (Exception e) {
                         e.printStackTrace();
-                        hook.editOriginal("Erro ao sincronizar o widget.")
+                        hook.editOriginal("Erro ao sincronizar o widget: " + e.getMessage())
                                 .queue();
                     }
                 }));
