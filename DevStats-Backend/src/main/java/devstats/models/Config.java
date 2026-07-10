@@ -22,6 +22,8 @@ public class Config {
 
     public static String ACCESS_TOKEN;
 
+    public static String CLIENT_SECRET;
+
 
 
     static {
@@ -44,6 +46,8 @@ public class Config {
             GITHUB_USERNAME = resolve("github.username", properties, envFile);
 
             GITHUB_TOKEN = resolve("github.token", properties, envFile);
+
+            CLIENT_SECRET = resolve("discord.client.secret", properties, envFile);
 
         } catch (Exception e) {
 

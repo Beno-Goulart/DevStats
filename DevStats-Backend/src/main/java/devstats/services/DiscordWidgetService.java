@@ -101,8 +101,8 @@ public class DiscordWidgetService {
 
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(profileUrl(userId)))
-                // .header("Authorization", "Bot " + Config.BOT_TOKEN)
-                .header("Authorization", "Bearer " + accessToken)
+                .header("Authorization", "Bot " + Config.BOT_TOKEN)
+                // .header("Authorization", "Bearer " + accessToken)
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(json))
