@@ -33,6 +33,10 @@ public class DiscordWidgetService {
     private final ObjectMapper mapper = new ObjectMapper();
 
     public void sync(GithubProfile profile) throws Exception {
+        sync(Config.USER_ID, Config.ACCESS_TOKEN, profile);
+    }
+
+    public void sync(String userId, String accessToken, GithubProfile profile) throws Exception {
 
         WidgetPayload payload = buildPayload(profile);
 
@@ -42,12 +46,12 @@ public class DiscordWidgetService {
         System.out.println(json);
         System.out.println("=====================================");
 
-        HttpResponse<String> response = sendPatch(json);
+        HttpResponse<String> response = sendPatch(userId, accessToken, json);
 
         System.out.println("Status : " + response.statusCode());
         System.out.println("Body   : " + response.body());
 
-        validateResponse(response);
+        validateResponse(userId, response);
     }
 
     private WidgetPayload buildPayload(GithubProfile profile) {
@@ -93,11 +97,12 @@ public class DiscordWidgetService {
         return value;
     }
 
-    private HttpResponse<String> sendPatch(String json) throws Exception {
+    private HttpResponse<String> sendPatch(String userId, String accessToken, String json) throws Exception {
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(profileUrl()))
-                .header("Authorization", "Bot " + Config.BOT_TOKEN)
+                .uri(URI.create(profileUrl(userId)))
+                // .header("Authorization", "Bot " + Config.BOT_TOKEN)
+                .header("Authorization", "Bearer " + accessToken)
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(json))
@@ -106,7 +111,7 @@ public class DiscordWidgetService {
         return client.send(request, HttpResponse.BodyHandlers.ofString());
     }
 
-    private void validateResponse(HttpResponse<String> response) throws IOException {
+    private void validateResponse(String userId, HttpResponse<String> response) throws IOException {
 
         if (response.statusCode() >= 200 && response.statusCode() < 300) {
             return;
@@ -114,19 +119,19 @@ public class DiscordWidgetService {
 
         throw new IOException(
                 "Discord Widget API request failed.\n" +
-                "URL: " + profileUrl() + "\n" +
+                "URL: " + profileUrl(userId) + "\n" +
                 "HTTP: " + response.statusCode() + "\n" +
                 response.body()
         );
     }
 
-    private String profileUrl() {
+    private String profileUrl(String userId) {
 
         return API
                 + "/applications/"
                 + Config.APPLICATION_ID
                 + "/users/"
-                + Config.USER_ID
+                + userId
                 + "/identities/0/profile";
     }
 }

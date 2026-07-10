@@ -1,80 +1,69 @@
 package devstats.commands;
 
+import devstats.services.DatabaseService;
+import devstats.services.OAuthService;
 import devstats.services.WidgetSyncService;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.InteractionHook;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-
-import java.util.concurrent.CompletableFuture;
+import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 
 public class WidgetCommand extends ListenerAdapter {
 
     private static final String COMMAND_NAME = "widget";
-    private static final String COMMAND_DESCRIPTION = "Atualiza seu DevStats Widget";
-    private static final String SYNC_STARTED_MESSAGE = "Atualizando widget...";
-    private static final String SYNC_SUCCESS_MESSAGE = "Widget atualizado com sucesso.";
-    private static final String SYNC_ERROR_MESSAGE = "Erro ao atualizar o widget";
+    private static final String COMMAND_DESCRIPTION = "Comandos do DevStats Widget";
 
-    private final WidgetSyncService widgetSyncService;
+    private final WidgetSetupCommand setupCommand;
+    private final WidgetRefreshCommand refreshCommand;
 
     public WidgetCommand() {
-
-        this(new WidgetSyncService());
-
+        this(new WidgetSyncService(), new OAuthService(), new DatabaseService());
     }
 
-    public WidgetCommand(WidgetSyncService widgetSyncService) {
-
-        this.widgetSyncService = widgetSyncService;
-
+    public WidgetCommand(WidgetSyncService widgetSyncService, OAuthService oAuthService, DatabaseService databaseService) {
+        this.setupCommand = new WidgetSetupCommand(oAuthService);
+        this.refreshCommand = new WidgetRefreshCommand(widgetSyncService, databaseService);
     }
 
     @Override
     public void onReady(ReadyEvent event) {
-
         event.getJDA().updateCommands()
                 .addCommands(
-                        Commands.slash(
-                                COMMAND_NAME,
-                                COMMAND_DESCRIPTION
-                        )
+                        Commands.slash(COMMAND_NAME, COMMAND_DESCRIPTION)
+                                .addSubcommands(
+                                        new SubcommandData("setup", "Configura seu widget DevStats"),
+                                        new SubcommandData("refresh", "Sincroniza seu widget DevStats")
+                                )
                 )
                 .queue();
 
-        System.out.println("Slash Commands registrados!");
-
+        System.out.println("Slash Commands do DevStats registrados!");
     }
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-
-        if (!event.getName().equals(COMMAND_NAME))
+        if (!event.getName().equals(COMMAND_NAME)) {
             return;
-
-        event.reply(SYNC_STARTED_MESSAGE)
-                .setEphemeral(true)
-                .queue(hook -> CompletableFuture.runAsync(() -> syncWidget(hook)));
-
-    }
-
-    private void syncWidget(InteractionHook hook) {
-
-        try {
-
-            widgetSyncService.sync();
-
-            hook.editOriginal(SYNC_SUCCESS_MESSAGE)
-                    .queue();
-
-        } catch (Exception e) {
-
-            hook.editOriginal(SYNC_ERROR_MESSAGE)
-                    .queue();
-
         }
 
-    }
+        String subcommand = event.getSubcommandName();
+        if (subcommand == null) {
+            return;
+        }
 
+        switch (subcommand) {
+            case "setup":
+                setupCommand.execute(event);
+                break;
+            case "refresh":
+                refreshCommand.execute(event);
+                break;
+            default:
+                event.reply("Subcomando desconhecido.")
+                        .setEphemeral(true)
+                        .queue();
+                break;
+        }
+    }
 }
