@@ -20,6 +20,10 @@ public class Config {
 
     public static String GITHUB_TOKEN;
 
+    public static String ACCESS_TOKEN;
+
+
+
     static {
 
         try {

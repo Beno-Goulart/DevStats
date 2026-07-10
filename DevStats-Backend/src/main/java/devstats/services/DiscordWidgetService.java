@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import devstats.models.Config;
 import devstats.models.DynamicField;
 import devstats.models.GithubProfile;
-import devstats.models.ImageField;
 import devstats.models.WidgetData;
 import devstats.models.WidgetPayload;
 
@@ -19,117 +18,120 @@ import java.util.List;
 public class DiscordWidgetService {
 
     private static final String API = "https://discord.com/api/v9";
-    private static final int TEXT_FIELD_TYPE = 1;
-    private static final int IMAGE_FIELD_TYPE = 2;
-    private static final String FIELD_FULL_NAME = "full_name";
-    private static final String FIELD_ROLE = "role";
-    private static final String FIELD_PROFILE_IMAGE = "profile_img";
-    private static final String FIELD_LANGUAGE = "language";
-    private static final String FIELD_COMMITS = "commits";
-    private static final String FIELD_LAST_COMMIT = "last_commit";
-    private static final String FIELD_LAST_REPOSITORY = "last_repo";
+
+    private static final int TEXT = 1;
+
+    private static final String FULL_NAME = "full_name";
+    private static final String ROLE = "role";
+    private static final String LANGUAGE = "language";
+    private static final String STREAK = "streak";
+    private static final String COMMITS = "commits";
+    private static final String LAST_COMMIT = "last_commit";
+    private static final String LAST_REPO = "last_repo";
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
     public void sync(GithubProfile profile) throws Exception {
-
-        syncProfile(profile);
-
+        sync(Config.USER_ID, Config.ACCESS_TOKEN, profile);
     }
 
-    public void syncProfile(GithubProfile profile) throws Exception {
+    public void sync(String userId, String accessToken, GithubProfile profile) throws Exception {
 
         WidgetPayload payload = buildPayload(profile);
+
         String json = mapper.writeValueAsString(payload);
 
-        HttpResponse<String> response = sendPatch(json);
+        System.out.println("========== DISCORD PAYLOAD ==========");
         System.out.println(json);
+        System.out.println("=====================================");
 
-        System.out.println(response.statusCode());
+        HttpResponse<String> response = sendPatch(userId, accessToken, json);
 
-        System.out.println(response.body());
-        validateResponse(response);
+        System.out.println("Status : " + response.statusCode());
+        System.out.println("Body   : " + response.body());
 
+        validateResponse(userId, response);
     }
 
     private WidgetPayload buildPayload(GithubProfile profile) {
 
         WidgetPayload payload = new WidgetPayload();
 
-        payload.setUsername(profile.getUsername());
+        payload.setUsername(value(profile.getUsername()));
         payload.setData(new WidgetData(buildDynamicFields(profile)));
 
         return payload;
-
     }
 
     private List<DynamicField> buildDynamicFields(GithubProfile profile) {
 
         List<DynamicField> fields = new ArrayList<>();
 
-        fields.add(textField(FIELD_FULL_NAME, profile.getFullName()));
-        fields.add(textField(FIELD_ROLE, profile.getBio()));
-        fields.add(imageField(FIELD_PROFILE_IMAGE, profile.getAvatarUrl()));
-        fields.add(textField(FIELD_LANGUAGE, profile.getMainLanguage()));
-        fields.add(textField(FIELD_COMMITS, String.valueOf(profile.getCommits())));
-        fields.add(textField(FIELD_LAST_COMMIT, profile.getLastCommit()));
-        fields.add(textField(FIELD_LAST_REPOSITORY, profile.getLastRepository()));
+        fields.add(field(FULL_NAME, profile.getFullName()));
+        fields.add(field(ROLE, profile.getBio()));
+        fields.add(field(LANGUAGE, profile.getMainLanguage()));
+
+        // implementar cálculo depois
+        fields.add(field(STREAK, "0"));
+
+        fields.add(field(COMMITS, String.valueOf(profile.getCommits())));
+        fields.add(field(LAST_COMMIT, profile.getLastCommit()));
+        fields.add(field(LAST_REPO, profile.getLastRepository()));
 
         return fields;
+    }
+
+    private DynamicField field(String name, String value) {
+
+        return new DynamicField(TEXT, name, value(value));
 
     }
 
-    private DynamicField textField(String name, String value) {
+    private String value(String value) {
 
-        return new DynamicField(TEXT_FIELD_TYPE, name, value);
+        if (value == null || value.isBlank()) {
+            return "";
+        }
 
+        return value;
     }
 
-    private ImageField imageField(String name, String value) {
-
-        return new ImageField(IMAGE_FIELD_TYPE, name, value);
-
-    }
-
-    private HttpResponse<String> sendPatch(String json) throws Exception {
+    private HttpResponse<String> sendPatch(String userId, String accessToken, String json) throws Exception {
 
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(profileUrl()))
-                .header("Authorization", "Bot " + Config.BOT_TOKEN)
+                .uri(URI.create(profileUrl(userId)))
+                // .header("Authorization", "Bot " + Config.BOT_TOKEN)
+                .header("Authorization", "Bearer " + accessToken)
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .method("PATCH", HttpRequest.BodyPublishers.ofString(json))
                 .build();
 
         return client.send(request, HttpResponse.BodyHandlers.ofString());
-
     }
 
-    private void validateResponse(HttpResponse<String> response) throws IOException {
+    private void validateResponse(String userId, HttpResponse<String> response) throws IOException {
 
-        if (response.statusCode() < 200 || response.statusCode() >= 300) {
-            throw new IOException(
-                    "Discord Widget API request failed: PATCH " +
-                            profileUrl() +
-                            " returned HTTP " +
-                            response.statusCode() +
-                            " - " +
-                            response.body()
-            );
+        if (response.statusCode() >= 200 && response.statusCode() < 300) {
+            return;
         }
 
+        throw new IOException(
+                "Discord Widget API request failed.\n" +
+                "URL: " + profileUrl(userId) + "\n" +
+                "HTTP: " + response.statusCode() + "\n" +
+                response.body()
+        );
     }
 
-    private String profileUrl() {
+    private String profileUrl(String userId) {
 
-        return API +
-                "/applications/" +
-                Config.APPLICATION_ID +
-                "/users/" +
-                Config.USER_ID +
-                "/identities/0/profile";
-
+        return API
+                + "/applications/"
+                + Config.APPLICATION_ID
+                + "/users/"
+                + userId
+                + "/identities/0/profile";
     }
-
 }

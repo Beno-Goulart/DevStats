@@ -1,40 +1,30 @@
 package devstats;
 
-
 import devstats.commands.WidgetCommand;
 import devstats.models.Config;
-import devstats.models.GithubProfile;
+import devstats.services.DatabaseService;
 import devstats.services.DiscordWidgetService;
 import devstats.services.GithubService;
+import devstats.services.OAuthService;
+import devstats.services.WidgetSyncService;
 import net.dv8tion.jda.api.JDABuilder;
 
 public class Main {
 
     public static void main(String[] args) throws Exception {
 
+        // Inicializar os serviços
+        DatabaseService databaseService = new DatabaseService();
+        OAuthService oAuthService = new OAuthService();
+        GithubService githubService = new GithubService();
+        DiscordWidgetService discordWidgetService = new DiscordWidgetService();
+        WidgetSyncService widgetSyncService = new WidgetSyncService(githubService, discordWidgetService);
+
+        // Iniciar o JDA Bot e registrar os listeners / comandos
         JDABuilder.createDefault(Config.BOT_TOKEN)
-                .addEventListeners(new WidgetCommand())
+                .addEventListeners(new WidgetCommand(widgetSyncService, oAuthService, databaseService))
                 .build();
 
-        GithubService githubService = new GithubService();
-
-        GithubProfile profile = githubService.getProfile();
-
-        DiscordWidgetService discord = new DiscordWidgetService();
-
-        discord.sync(profile);
-
-        System.out.println("SYNC FINALIZADO");
-
-        System.out.println(profile.getFullName());
-        System.out.println(profile.getBio());
-        System.out.println(profile.getMainLanguage());
-        System.out.println(profile.getLastRepository());
-        System.out.println(profile.getLastCommit());
-        System.out.println(profile.getCommits());
-
+        System.out.println("DevStats Bot inicializado com sucesso!");
     }
-
-
-
 }

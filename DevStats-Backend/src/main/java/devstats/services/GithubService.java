@@ -14,6 +14,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class GithubService {
 
@@ -24,25 +25,53 @@ public class GithubService {
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public GithubProfile getProfile() throws Exception {
-
-        GithubProfile profile = new GithubProfile();
-
-        JsonNode user = getJsonNode("/users/" + encodePathSegment(Config.GITHUB_USERNAME));
-
-        profile.setUsername(textField(user, "login"));
-        profile.setFullName(textField(user, "name"));
-        profile.setBio(textField(user, "bio"));
-        profile.setAvatarUrl(textField(user, "avatar_url"));
-        profile.setStreak(0);
-
-        loadRepositoryStats(profile);
-
-        return profile;
-
+    public Optional<GithubProfile> getProfile() {
+        return getProfile(Config.GITHUB_USERNAME);
     }
 
-    private void loadRepositoryStats(GithubProfile profile) throws Exception {
+    public Optional<GithubProfile> getProfile(String githubUsername) {
+        if (githubUsername == null || githubUsername.isBlank()) {
+            return Optional.empty();
+        }
+
+        try {
+            JsonNode user = fetchUserDetails(githubUsername);
+            if (user == null || user.isMissingNode() || user.isNull()) {
+                return Optional.empty();
+            }
+
+            GithubProfile profile = new GithubProfile();
+            profile.setUsername(textField(user, "login"));
+            profile.setFullName(textField(user, "name"));
+            profile.setBio(textField(user, "bio"));
+            profile.setAvatarUrl(textField(user, "avatar_url"));
+            profile.setStreak(0);
+
+            loadRepositoryStats(profile, githubUsername);
+
+            return Optional.of(profile);
+        } catch (Exception e) {
+            System.err.println("Erro ao obter perfil do GitHub para " + githubUsername + ": " + e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    private JsonNode fetchUserDetails(String username) throws Exception {
+        return getJsonNode("/users/" + encodePathSegment(username));
+    }
+
+    private JsonNode fetchUserRepositories(String username, int page) throws Exception {
+        return getJsonNode(
+                "/users/" +
+                        encodePathSegment(username) +
+                        "/repos?per_page=" +
+                        REPOSITORIES_PER_PAGE +
+                        "&page=" +
+                        page
+        );
+    }
+
+    private void loadRepositoryStats(GithubProfile profile, String githubUsername) throws Exception {
 
         Map<String, Long> languageBytes = new HashMap<>();
         JsonNode latestRepository = null;
@@ -51,14 +80,7 @@ public class GithubService {
 
         while (true) {
 
-            JsonNode repositories = getJsonNode(
-                    "/users/" +
-                            encodePathSegment(Config.GITHUB_USERNAME) +
-                            "/repos?per_page=" +
-                            REPOSITORIES_PER_PAGE +
-                            "&page=" +
-                            page
-            );
+            JsonNode repositories = fetchUserRepositories(githubUsername, page);
 
             if (!repositories.isArray() || repositories.isEmpty()) {
                 break;
