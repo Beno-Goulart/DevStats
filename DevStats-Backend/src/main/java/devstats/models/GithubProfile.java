@@ -12,9 +12,9 @@ public class GithubProfile {
 
     private String mainLanguage;
 
-    private int commits;
+    private int activeRepos;
 
-    private int streak;
+    private int commitsToday;
 
     private String lastCommit;
 
@@ -63,20 +63,20 @@ public class GithubProfile {
         this.mainLanguage = mainLanguage;
     }
 
-    public int getCommits() {
-        return commits;
+    public int getActiveRepos() {
+        return activeRepos;
     }
 
-    public void setCommits(int commits) {
-        this.commits = commits;
+    public void setActiveRepos(int activeRepos) {
+        this.activeRepos = activeRepos;
     }
 
-    public int getStreak() {
-        return streak;
+    public int getCommitsToday() {
+        return commitsToday;
     }
 
-    public void setStreak(int streak) {
-        this.streak = streak;
+    public void setCommitsToday(int commitsToday) {
+        this.commitsToday = commitsToday;
     }
 
     public String getLastCommit() {

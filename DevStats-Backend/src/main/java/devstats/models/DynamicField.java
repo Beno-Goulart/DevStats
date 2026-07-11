@@ -6,12 +6,12 @@ public class DynamicField {
 
     private String name;
 
-    private String value;
+    private Object value;
 
     public DynamicField() {
     }
 
-    public DynamicField(int type, String name, String value) {
+    public DynamicField(int type, String name, Object value) {
         this.type = type;
         this.name = name;
         this.value = value;
@@ -33,11 +33,11 @@ public class DynamicField {
         this.name = name;
     }
 
-    public String getValue() {
+    public Object getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Object value) {
         this.value = value;
     }
 
