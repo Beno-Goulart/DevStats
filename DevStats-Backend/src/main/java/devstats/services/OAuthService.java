@@ -3,6 +3,7 @@ package devstats.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import devstats.models.Config;
 import devstats.models.DiscordTokenResponse;
+import devstats.models.DiscordUser;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.net.http.HttpClient;
@@ -16,6 +17,7 @@ public class OAuthService {
 
     private static final String TOKEN_URL = "https://discord.com/api/v10/oauth2/token";
     private static final String USER_URL = "https://discord.com/api/v10/users/@me";
+    private static final String REDIRECT_URI = "http://localhost:8080/callback";
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
@@ -26,8 +28,7 @@ public class OAuthService {
             clientId = "1509844130082062396";
         }
 
-        String redirectUri = "http://localhost:8080/callback";
-        String encodedRedirect = URLEncoder.encode(redirectUri, StandardCharsets.UTF_8);
+        String encodedRedirect = URLEncoder.encode(REDIRECT_URI, StandardCharsets.UTF_8);
         String scope = URLEncoder.encode("identify role_connections.write", StandardCharsets.UTF_8);
 
         return "https://discord.com/oauth2/authorize" +
@@ -38,14 +39,15 @@ public class OAuthService {
     }
 
     public DiscordTokenResponse exchangeCodeForToken(String code) throws Exception {
-        String redirectUri = "http://localhost:8080/callback";
+
+        System.out.println("[OAuth] Trocando code por access token...");
 
         String form = Map.of(
                 "client_id", Config.APPLICATION_ID,
                 "client_secret", Config.CLIENT_SECRET,
                 "grant_type", "authorization_code",
                 "code", code,
-                "redirect_uri", redirectUri
+                "redirect_uri", REDIRECT_URI
         ).entrySet().stream()
                 .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
                 .collect(Collectors.joining("&"));
@@ -58,20 +60,21 @@ public class OAuthService {
 
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
-        System.out.println("[OAuthService] Token exchange response status: " + response.statusCode());
-
         if (response.statusCode() < 200 || response.statusCode() >= 300) {
             throw new RuntimeException("Falha na troca do authorization code. HTTP " + response.statusCode() + ": " + response.body());
         }
 
         DiscordTokenResponse tokenResponse = mapper.readValue(response.body(), DiscordTokenResponse.class);
-        System.out.println("[OAuthService] Access token obtido. Expira em: " + tokenResponse.getExpiresIn() + "s");
-        System.out.println("[OAuthService] Scope: " + tokenResponse.getScope());
+
+        System.out.println("[OAuth] Access Token obtido. Expira em: " + tokenResponse.getExpiresIn() + "s");
 
         return tokenResponse;
     }
 
-    public String getDiscordUser(String accessToken) throws Exception {
+    public DiscordUser getDiscordUser(String accessToken) throws Exception {
+
+        System.out.println("[OAuth] Obtendo identidade do usuário no Discord...");
+
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(URI.create(USER_URL))
                 .header("Authorization", "Bearer " + accessToken)
@@ -84,22 +87,42 @@ public class OAuthService {
             throw new RuntimeException("Falha ao obter identidade do usuário Discord. HTTP " + response.statusCode() + ": " + response.body());
         }
 
-        String discordId = mapper.readTree(response.body()).get("id").asText();
-        System.out.println("[OAuthService] Usuário Discord identificado: " + discordId);
+        DiscordUser user = mapper.readValue(response.body(), DiscordUser.class);
 
-        return discordId;
+        System.out.println("[OAuth] Usuário identificado: " + user.getId() + " (" + user.getUsername() + ")");
+
+        return user;
     }
 
-    public String refreshAccessToken(String refreshToken) {
-        // TODO: Implementar atualização do token de acesso expirado.
-        // Deve enviar uma requisição POST para 'https://discord.com/api/v10/oauth2/token'
-        // com os seguintes parâmetros form-urlencoded:
-        // - client_id
-        // - client_secret (a ser lido do Config)
-        // - grant_type: "refresh_token"
-        // - refresh_token: refreshToken
-        System.out.println("[OAuthService] TODO: Implementar atualização de access token via refresh token.");
-        System.out.println("[OAuthService] Refresh Token utilizado: " + refreshToken);
-        return "mocked_refreshed_access_token";
+    public DiscordTokenResponse refreshAccessToken(String refreshToken) throws Exception {
+
+        System.out.println("[OAuth] Renovando access token...");
+
+        String form = Map.of(
+                "client_id", Config.APPLICATION_ID,
+                "client_secret", Config.CLIENT_SECRET,
+                "grant_type", "refresh_token",
+                "refresh_token", refreshToken
+        ).entrySet().stream()
+                .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
+                .collect(Collectors.joining("&"));
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(TOKEN_URL))
+                .header("Content-Type", "application/x-www-form-urlencoded")
+                .POST(HttpRequest.BodyPublishers.ofString(form))
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() < 200 || response.statusCode() >= 300) {
+            throw new RuntimeException("Falha ao renovar access token. HTTP " + response.statusCode() + ": " + response.body());
+        }
+
+        DiscordTokenResponse tokenResponse = mapper.readValue(response.body(), DiscordTokenResponse.class);
+
+        System.out.println("[OAuth] Access token renovado com sucesso.");
+
+        return tokenResponse;
     }
 }

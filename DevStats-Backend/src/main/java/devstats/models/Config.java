@@ -49,6 +49,8 @@ public class Config {
 
             CLIENT_SECRET = resolve("discord.client.secret", properties, envFile);
 
+            ACCESS_TOKEN = resolve("discord.access.token", properties, envFile);
+
         } catch (Exception e) {
 
             throw new RuntimeException(e);
