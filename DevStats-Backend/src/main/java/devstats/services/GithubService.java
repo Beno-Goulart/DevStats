@@ -12,6 +12,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -45,7 +49,6 @@ public class GithubService {
             profile.setFullName(textField(user, "name"));
             profile.setBio(textField(user, "bio"));
             profile.setAvatarUrl(textField(user, "avatar_url"));
-            profile.setStreak(0);
 
             loadRepositoryStats(profile, githubUsername);
 
@@ -75,6 +78,8 @@ public class GithubService {
 
         Map<String, Long> languageBytes = new HashMap<>();
         JsonNode latestRepository = null;
+        int activeReposCount = 0;
+        Instant thirtyDaysAgo = Instant.now().minus(30, ChronoUnit.DAYS);
 
         int page = 1;
 
@@ -89,6 +94,11 @@ public class GithubService {
             for (JsonNode repository : repositories) {
 
                 addRepositoryLanguages(repository, languageBytes);
+
+                String pushedAt = textField(repository, "pushed_at");
+                if (!pushedAt.isBlank() && Instant.parse(pushedAt).isAfter(thirtyDaysAgo)) {
+                    activeReposCount++;
+                }
 
                 if (
                         latestRepository == null ||
@@ -108,9 +118,9 @@ public class GithubService {
         }
 
         profile.setMainLanguage(findMainLanguage(languageBytes));
+        profile.setActiveRepos(activeReposCount);
 
         if (latestRepository == null) {
-            profile.setCommits(0);
             return;
         }
 
@@ -161,15 +171,23 @@ public class GithubService {
         );
 
         if (!commits.isArray() || commits.isEmpty()) {
-            profile.setCommits(0);
             return;
+        }
+
+        int commitsToday = 0;
+        Instant startOfDay = LocalDate.now(ZoneOffset.UTC).atStartOfDay(ZoneOffset.UTC).toInstant();
+
+        for (JsonNode commit : commits) {
+            String dateStr = commit.path("commit").path("author").path("date").asText("");
+            if (!dateStr.isBlank() && Instant.parse(dateStr).isAfter(startOfDay)) {
+                commitsToday++;
+            }
         }
 
         JsonNode latestCommit = commits.get(0);
         String message = textField(latestCommit.path("commit"), "message");
-
         profile.setLastCommit(message.isBlank() ? textField(latestCommit, "sha") : message);
-        profile.setCommits(commits.size());
+        profile.setCommitsToday(commitsToday);
 
     }
 

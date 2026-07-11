@@ -14,20 +14,23 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class DiscordWidgetService {
 
     private static final String API = "https://discord.com/api/v9";
 
     private static final int TEXT = 1;
+    private static final int IMAGE = 3;
 
     private static final String FULL_NAME = "full_name";
     private static final String ROLE = "role";
     private static final String LANGUAGE = "language";
-    private static final String STREAK = "streak";
-    private static final String COMMITS = "commits";
-    private static final String LAST_COMMIT = "last_commit";
+    private static final String ACTIVE_REPOS = "active_repos";
     private static final String LAST_REPO = "last_repo";
+    private static final String LAST_COMMIT = "last_commit";
+    private static final String COMMITS_TODAY = "commits_today";
+    private static final String AVATAR = "avatar";
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
@@ -59,7 +62,14 @@ public class DiscordWidgetService {
         WidgetPayload payload = new WidgetPayload();
 
         payload.setUsername(value(profile.getUsername()));
-        payload.setData(new WidgetData(buildDynamicFields(profile)));
+
+        List<DynamicField> dynamicFields = buildDynamicFields(profile);
+
+        if (profile.getAvatarUrl() != null && !profile.getAvatarUrl().isBlank()) {
+            dynamicFields.add(new DynamicField(IMAGE, AVATAR, Map.of("url", profile.getAvatarUrl())));
+        }
+
+        payload.setData(new WidgetData(dynamicFields));
 
         return payload;
     }
@@ -71,13 +81,10 @@ public class DiscordWidgetService {
         fields.add(field(FULL_NAME, profile.getFullName()));
         fields.add(field(ROLE, profile.getBio()));
         fields.add(field(LANGUAGE, profile.getMainLanguage()));
-
-        // implementar cálculo depois
-        fields.add(field(STREAK, "0"));
-
-        fields.add(field(COMMITS, String.valueOf(profile.getCommits())));
-        fields.add(field(LAST_COMMIT, profile.getLastCommit()));
+        fields.add(field(ACTIVE_REPOS, String.valueOf(profile.getActiveRepos())));
         fields.add(field(LAST_REPO, profile.getLastRepository()));
+        fields.add(field(LAST_COMMIT, profile.getLastCommit()));
+        fields.add(field(COMMITS_TODAY, String.valueOf(profile.getCommitsToday())));
 
         return fields;
     }
@@ -88,10 +95,16 @@ public class DiscordWidgetService {
 
     }
 
+    private static final int MAX_FIELD_LENGTH = 100;
+
     private String value(String value) {
 
         if (value == null || value.isBlank()) {
             return "";
+        }
+
+        if (value.length() > MAX_FIELD_LENGTH) {
+            return value.substring(0, MAX_FIELD_LENGTH);
         }
 
         return value;
