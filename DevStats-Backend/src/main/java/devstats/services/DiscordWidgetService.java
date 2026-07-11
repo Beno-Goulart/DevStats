@@ -24,13 +24,13 @@ public class DiscordWidgetService {
     private static final int IMAGE = 3;
 
     private static final String FULL_NAME = "full_name";
-    private static final String ROLE = "role";
+    private static final String ROLE = "bio";
     private static final String LANGUAGE = "language";
-    private static final String ACTIVE_REPOS = "active_repos";
+    private static final String ACTIVE_REPOS = "active";
     private static final String LAST_REPO = "last_repo";
     private static final String LAST_COMMIT = "last_commit";
     private static final String COMMITS_TODAY = "commits_today";
-    private static final String AVATAR = "avatar";
+    private static final String AVATAR = "profile_img";
 
     private final HttpClient client = HttpClient.newHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
