@@ -83,7 +83,9 @@ Click the button to authorize via OAuth2. Your Discord account is now linked.
 
 Widgets v2 is still experimental — you need to enable it manually via DevTools.
 
-#### 5a. Enable the experiment
+> **Easier alternative:** Use [Widget Identity Creator](https://github.com/chloecinders/widget-identity-creator/releases) — a small open-source desktop app that automates the entire setup. Just paste your bot token and it handles the rest (fetches app data, validates config, applies identity). Much safer than pasting tokens into a website, and no DevTools required.
+
+#### 5a. Enable the experiment (manual)
 
 1. Open Discord in your **browser** (or desktop with DevTools enabled)
 2. Press `Ctrl + Shift + I` → **Console** tab
@@ -121,7 +123,9 @@ For the full guide, see [chloecinders.com/blog/discord-widgets](https://chloecin
 
 Anyone with their own Discord Application can use the same widget layout. The visual config is exported as a single JSON file in [`widget-config.json`](DevStats-Backend/src/main/resources/widget-config.json).
 
-**To import into your app:**
+**Recommended:** Use [Widget Identity Creator](https://github.com/chloecinders/widget-identity-creator/releases) — just paste your bot token and the app applies the widget config automatically.
+
+**Manual import via DevTools:**
 
 1. Go to [Discord Developer Portal](https://discord.com/developers/applications) → your application
 2. Open **DevTools** in the Discord client (`Ctrl + Shift + I`)
