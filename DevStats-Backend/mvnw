@@ -1,0 +1,27 @@
+#!/bin/sh
+# Apache Maven Wrapper startup script for UN*X systems
+# Usage: ./mvnw [options]
+
+set -e
+
+MAVEN_VERSION="3.9.9"
+MAVEN_HOME="${HOME}/.m2/wrapper/dists/apache-maven-${MAVEN_VERSION}"
+MAVEN_URL="https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/${MAVEN_VERSION}/apache-maven-${MAVEN_VERSION}-bin.zip"
+
+if [ ! -d "$MAVEN_HOME" ]; then
+    echo "Downloading Maven ${MAVEN_VERSION}..."
+    mkdir -p "$MAVEN_HOME"
+    if command -v curl > /dev/null 2>&1; then
+        curl -fsSL "$MAVEN_URL" -o /tmp/maven.zip
+    elif command -v wget > /dev/null 2>&1; then
+        wget -q "$MAVEN_URL" -O /tmp/maven.zip
+    else
+        echo "Error: Neither curl nor wget found" >&2
+        exit 1
+    fi
+    unzip -qo /tmp/maven.zip -d "$MAVEN_HOME"
+    rm -f /tmp/maven.zip
+    mv "$MAVEN_HOME/apache-maven-${MAVEN_VERSION}"/* "$MAVEN_HOME/"
+fi
+
+exec "$MAVEN_HOME/bin/mvn" "$@"
