@@ -196,7 +196,11 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for full diagrams.
 
 ### Knowledge Graph (Graphify)
 
-341 nodes · 807 edges · 17 communities detected.
+<p align="center">
+  <img src="docs/graphify-preview.png" alt="DevStats Knowledge Graph" width="700">
+</p>
+
+<p align="center"><em>341 nodes · 807 edges · 17 communities — top 60 most connected classes</em></p>
 
 | God Node | Edges | Role |
 |---|---|---|
@@ -207,9 +211,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for full diagrams.
 | `WidgetSyncService` | 18 | Orchestrator |
 | `GithubService` | 16 | GitHub API client |
 
-Open [graphify-out/graph.html](./graphify-out/graph.html) in your browser for an **interactive force-directed visualization** — click nodes to explore connections, filter by community.
-
-See [graphify-out/GRAPH_REPORT.md](./graphify-out/GRAPH_REPORT.md) for the full report.
+Open [graphify-out/graph.html](./graphify-out/graph.html) for the **interactive version** — click nodes, filter by community.
 
 ## Deploy
 
