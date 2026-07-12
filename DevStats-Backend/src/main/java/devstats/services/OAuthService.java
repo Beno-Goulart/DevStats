@@ -30,7 +30,7 @@ public class OAuthService {
         }
 
         String encodedRedirect = URLEncoder.encode(getRedirectUri(), StandardCharsets.UTF_8);
-        String scope = URLEncoder.encode("identify role_connections.write", StandardCharsets.UTF_8);
+        String scope = URLEncoder.encode("identify sdk.social_layer", StandardCharsets.UTF_8);
 
         return "https://discord.com/oauth2/authorize" +
                 "?client_id=" + clientId +
