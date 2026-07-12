@@ -91,34 +91,108 @@ Your Discord profile now shows your live GitHub stats.
 
 ## Architecture
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    DevStats Bot                          │
-│                                                         │
-│  ┌──────────┐   ┌──────────────┐   ┌────────────────┐  │
-│  │  JDA Bot  │   │  HTTP Server  │   │  Auto-Sync     │  │
-│  │  (port    │   │  (port 8080)  │   │  (every 1min)  │  │
-│  │  Gateway) │   │  /callback    │   │                │  │
-│  │           │   │  /webhook/*   │   │                │  │
-│  └─────┬─────┘   └──────┬───────┘   └───────┬────────┘  │
-│        │                │                    │           │
-│        └────────────────┼────────────────────┘           │
-│                         │                                │
-│              ┌──────────┴──────────┐                     │
-│              │   WidgetSyncService  │                     │
-│              │   (Orchestrator)     │                     │
-│              └──────────┬──────────┘                     │
-│                         │                                │
-│         ┌───────────────┼───────────────┐                │
-│         │               │               │                │
-│  ┌──────┴──────┐ ┌──────┴──────┐ ┌──────┴──────┐       │
-│  │ GithubService│ │DiscordWidget│ │DatabaseService│      │
-│  │ (REST API)   │ │Service      │ │(Neon/SQLite) │      │
-│  └──────────────┘ └─────────────┘ └──────────────┘      │
-└─────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    Main["Main.java"]
+
+    subgraph Commands
+        WidgetCommand["WidgetCommand"]
+        SetupCmd["WidgetSetupCommand"]
+        GithubCmd["WidgetGithubCommand"]
+        RefreshCmd["WidgetRefreshCommand"]
+    end
+
+    subgraph HTTP
+        OAuthServer["OAuthServer :8080"]
+        OAuthCb["OAuthCallbackHandler /callback"]
+        WebhookServer["WebhookServer :8080"]
+        WebhookHandler["WebhookHandler /webhook/github"]
+    end
+
+    subgraph Services
+        DatabaseService["DatabaseService"]
+        OAuthService["OAuthService"]
+        GithubService["GithubService"]
+        WidgetSync["WidgetSyncService"]
+        DiscordWidget["DiscordWidgetService"]
+        AutoSync["AutoSyncService 1min"]
+    end
+
+    Main --> WidgetCommand
+    Main --> OAuthServer
+    Main --> WebhookServer
+    Main --> AutoSync
+    Main --> DatabaseService
+
+    WidgetCommand --> SetupCmd
+    WidgetCommand --> GithubCmd
+    WidgetCommand --> RefreshCmd
+    SetupCmd --> OAuthService
+    GithubCmd --> DatabaseService
+    RefreshCmd --> WidgetSync
+
+    OAuthServer --> OAuthCb
+    OAuthCb --> OAuthService
+    OAuthCb --> DatabaseService
+    WebhookServer --> WebhookHandler
+    WebhookHandler --> WidgetSync
+    WebhookHandler --> DatabaseService
+
+    WidgetSync --> GithubService
+    WidgetSync --> DiscordWidget
+
+    AutoSync --> WidgetSync
+    AutoSync --> DatabaseService
+    AutoSync --> OAuthService
+
+    DiscordWidget -.->|"PATCH profile"| Discord["Discord API"]
+    GithubService -.->|"REST"| GitHub["GitHub API"]
+    DatabaseService -.->|"JDBC"| Neon[("Neon PostgreSQL")]
 ```
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed diagrams (Mermaid).
+### OAuth Flow
+
+```mermaid
+sequenceDiagram
+    participant User as Discord User
+    participant Bot as DevStats Bot
+    participant Discord as Discord API
+    participant Neon as Neon DB
+
+    User->>Bot: /widget setup
+    Bot-->>User: "Click to authorize"
+    User->>Discord: Approve OAuth
+    Discord-->>Bot: GET /callback?code=xxx
+    Bot->>Discord: POST /oauth2/token
+    Discord-->>Bot: access_token + refresh_token
+    Bot->>Discord: GET /users/@me
+    Discord-->>Bot: DiscordUser{id, username}
+    Bot->>Neon: INSERT/UPDATE users
+    Bot-->>User: "Connected!"
+```
+
+### Sync Flow
+
+```mermaid
+sequenceDiagram
+    participant User as Discord User
+    participant Bot as DevStats Bot
+    participant Neon as Neon DB
+    participant GitHub as GitHub API
+    participant Discord as Discord API
+
+    User->>Bot: /widget refresh
+    Bot->>Neon: findUser(discordId)
+    Bot-->>User: "Syncing..."
+    Bot->>GitHub: GET /users/{username}
+    Bot->>GitHub: GET /repos, /languages, /commits
+    GitHub-->>Bot: GithubProfile
+    Bot->>Discord: PATCH identities/0/profile
+    Bot->>Neon: UPDATE last_sync
+    Bot-->>User: "Synced!"
+```
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for full diagrams.
 
 ### Knowledge Graph (Graphify)
 
