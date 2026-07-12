@@ -1,78 +1,214 @@
-# ⚡ DevStats
-
 <p align="center">
-  <img src="docs/logo.png" alt="DevStats Widget Preview" width="470">
+  <img src="docs/logo.png" alt="DevStats" width="470">
 </p>
 
 <p align="center">
-  <strong>Display your GitHub activity directly on your Discord profile.</strong>
+  <strong>Your GitHub activity, live on your Discord profile.</strong>
 </p>
 
 <p align="center">
-A Discord Widget powered by the Discord Social SDK that automatically synchronizes GitHub statistics and displays them on your Discord profile.
+  <a href="https://github.com/Beno-Goulart/DevStats/stargazers"><img src="https://img.shields.io/github/stars/Beno-Goulart/DevStats?style=flat&color=yellow" alt="Stars"></a>
+  <a href="https://github.com/Beno-Goulart/DevStats/blob/main/LICENSE"><img src="https://img.shields.io/github/license/Beno-Goulart/DevStats?style=flat" alt="License"></a>
+  <a href="https://github.com/Beno-Goulart/DevStats/commits/main"><img src="https://img.shields.io/github/last-commit/Beno-Goulart/DevStats?style=flat" alt="Last commit"></a>
+  <img src="https://img.shields.io/badge/Java-21-ED8B00?style=flat&logo=openjdk&logoColor=white" alt="Java 21">
+  <img src="https://img.shields.io/badge/Deploy-Fly.io-7B3FE4?style=flat&logo=flydotio&logoColor=white" alt="Fly.io">
 </p>
-
-# 📖 Overview
-
-DevStats is an open-source project that creates a **dynamic Discord Widget** capable of displaying real GitHub statistics directly on a user's Discord profile.
-
-Instead of static information, the widget is synchronized with GitHub and automatically displays development activity such as:
-
-- 👤 GitHub Profile
-- 💼 Bio
-- 💻 Primary Language
-- 🔥 Contribution Streak
-- 📦 Latest Repository
-- 📝 Latest Commit
-- 📈 Daily Commits
-
-The project is currently being developed as a **personal implementation**, but its architecture has been designed from the beginning to evolve into a public platform where any developer can connect their GitHub account and use their own widget.
-
-# ✨ Preview
 
 <p align="center">
-  <img src="docs/widget-preview.gif" width="470">
+  <a href="#preview">Preview</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#quick-start">Quick Start</a> ·
+  <a href="#commands">Commands</a> ·
+  <a href="#architecture">Architecture</a> ·
+  <a href="#deploy">Deploy</a> ·
+  <a href="#tech-stack">Tech Stack</a>
 </p>
 
-## 🚀 Features
+---
 
-- Today's commits counter
-- Contribution streak tracking
-- Featured repository display
-- Live GitHub activity sync
-- Discord profile widget integration
+DevStats is a Discord bot that displays your **real-time GitHub activity** directly on your Discord profile using the Discord Social SDK (Widgets v2). It syncs automatically — your profile always reflects what you're actually building.
 
-## 🛠️ Tech Stack
+## Preview
 
-- Node.js
-- Discord Social SDK / Widgets v2
-- GitHub REST API
-- Express.js
+<p align="center">
+  <img src="docs/widget-preview.gif" width="470" alt="DevStats Widget Preview">
+</p>
 
-## 📦 How it works
+## Features
 
-1. User connects GitHub account via OAuth2
-2. Backend fetches GitHub activity
-3. Data is processed (commits, streaks, stats)
-4. Discord widget is updated via API
+| Feature | Description |
+|---|---|
+| GitHub Profile | Your avatar and display name from GitHub |
+| Bio | Your GitHub bio |
+| Primary Language | Most used language across repos |
+| Active Repos | Total number of repositories |
+| Latest Repository | Most recently updated repo |
+| Latest Commit | Last commit message |
+| Daily Commits | Commits counter for today |
+| Auto-Sync | Widget refreshes every minute in the background |
+| Webhook Support | Instant sync on GitHub push events |
+| Multi-User | Multiple users can connect their accounts |
 
-## 🔒 Privacy
+## Quick Start
 
-DevStats only uses GitHub data required to generate statistics. No data is sold or permanently stored.
+### 1. Invite the Bot
 
-See: `privacy.html`
+> **Authorization URL:** `https://discord.com/oauth2/authorize?client_id=YOUR_APP_ID`
 
-## 📜 Terms
+Grant the required scopes: `identify`, `role_connections.write`.
 
-See: `terms.html`
+### 2. Connect Your GitHub
 
-## 📄 License
+In any channel where the bot is present:
 
-MIT License
+```
+/widget setup
+```
 
-## 💡 Future ideas
+Click the button to authorize via OAuth2. Your Discord account is now linked.
 
-- Steam stats integration
-- LeetCode tracking
-- XP/gamification system
-- Multi-platform developer profile card
+### 3. Set Your GitHub Username
+
+```
+/widget github <your-username>
+```
+
+### 4. Sync Your Widget
+
+```
+/widget refresh
+```
+
+Your Discord profile now shows your live GitHub stats.
+
+## Commands
+
+| Command | Description |
+|---|---|
+| `/widget setup` | Start the OAuth2 flow to connect your Discord account |
+| `/widget github <username>` | Set your GitHub username |
+| `/widget refresh` | Manually sync your widget with the latest GitHub data |
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    DevStats Bot                          │
+│                                                         │
+│  ┌──────────┐   ┌──────────────┐   ┌────────────────┐  │
+│  │  JDA Bot  │   │  HTTP Server  │   │  Auto-Sync     │  │
+│  │  (port    │   │  (port 8080)  │   │  (every 1min)  │  │
+│  │  Gateway) │   │  /callback    │   │                │  │
+│  │           │   │  /webhook/*   │   │                │  │
+│  └─────┬─────┘   └──────┬───────┘   └───────┬────────┘  │
+│        │                │                    │           │
+│        └────────────────┼────────────────────┘           │
+│                         │                                │
+│              ┌──────────┴──────────┐                     │
+│              │   WidgetSyncService  │                     │
+│              │   (Orchestrator)     │                     │
+│              └──────────┬──────────┘                     │
+│                         │                                │
+│         ┌───────────────┼───────────────┐                │
+│         │               │               │                │
+│  ┌──────┴──────┐ ┌──────┴──────┐ ┌──────┴──────┐       │
+│  │ GithubService│ │DiscordWidget│ │DatabaseService│      │
+│  │ (REST API)   │ │Service      │ │(Neon/SQLite) │      │
+│  └──────────────┘ └─────────────┘ └──────────────┘      │
+└─────────────────────────────────────────────────────────┘
+```
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed diagrams (Mermaid).
+
+## Deploy
+
+### Fly.io (Production)
+
+```bash
+# Install flyctl
+curl -L https://fly.io/install.sh | sh
+
+# Launch
+flyctl launch
+
+# Set environment variables
+flyctl secrets set DISCORD_BOT_TOKEN=your_token
+flyctl secrets set DISCORD_APPLICATION_ID=your_app_id
+flyctl secrets set DISCORD_CLIENT_SECRET=your_secret
+flyctl secrets set DATABASE_URL=your_neon_connection_string
+flyctl secrets set OAUTH_REDIRECT_URI=https://your-app.fly.dev/callback
+
+# Deploy
+flyctl deploy
+```
+
+### Local Development
+
+```bash
+# Clone
+git clone https://github.com/Beno-Goulart/DevStats.git
+cd DevStats
+
+# Create .env file (see .env.example)
+cp DevStats-Backend/.env.example DevStats-Backend/.env
+
+# Build and run
+cd DevStats-Backend
+mvn clean package -DskipTests
+java -jar target/devstats-bot-1.0.0.jar
+```
+
+The bot uses SQLite locally when `DATABASE_URL` is not set.
+
+## Tech Stack
+
+| Component | Technology |
+|---|---|
+| Language | Java 21 |
+| Discord Bot | [JDA](https://github.com/DV8FromTheWorld/JDA) 5.6.1 |
+| HTTP Server | `com.sun.net.httpserver` (shared port 8080) |
+| Database | PostgreSQL via [Neon](https://neon.tech) (prod) / SQLite (local) |
+| Migrations | [Liquibase](https://www.liquibase.org) |
+| Build | Maven + Shade Plugin (fat JAR) |
+| Deployment | [Fly.io](https://fly.io) (Docker) |
+| CI | GitHub Actions |
+
+## Project Structure
+
+```
+DevStats/
+├── DevStats-Backend/
+│   └── src/main/java/devstats/
+│       ├── Main.java                    # Entry point
+│       ├── commands/                    # Slash commands
+│       │   ├── WidgetCommand.java       # /router
+│       │   ├── WidgetSetupCommand.java  # /setup
+│       │   ├── WidgetGithubCommand.java # /github
+│       │   └── WidgetRefreshCommand.java # /refresh
+│       ├── services/                    # Business logic
+│       │   ├── DatabaseService.java     # DB access + migrations
+│       │   ├── OAuthService.java        # Discord OAuth2
+│       │   ├── GithubService.java       # GitHub REST API
+│       │   ├── DiscordWidgetService.java # Widget v2 API
+│       │   ├── WidgetSyncService.java   # Orchestrator
+│       │   └── AutoSyncService.java     # Background scheduler
+│       ├── http/                        # HTTP handlers
+│       │   ├── OAuthServer.java         # /callback
+│       │   └── WebhookServer.java       # /webhook/github
+│       ├── models/                      # Data classes
+│       └── utils/                       # HTTP, JSON, Date helpers
+├── Dockerfile
+├── fly.toml
+└── ARCHITECTURE.md
+```
+
+## Privacy
+
+DevStats only accesses GitHub data required to generate statistics. OAuth tokens are stored securely in the database and are never shared. No data is sold or used for analytics.
+
+- [Privacy Policy](docs/privacy.html)
+- [Terms of Service](docs/terms.html)
+
+## License
+
+[MIT](LICENSE) — use it, fork it, deploy it.
