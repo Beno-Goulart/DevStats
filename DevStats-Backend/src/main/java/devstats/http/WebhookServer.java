@@ -6,27 +6,23 @@ import devstats.services.WidgetSyncService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
-
 public class WebhookServer {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookServer.class);
 
     private final HttpServer server;
 
-    public WebhookServer(WidgetSyncService widgetSyncService, DatabaseService databaseService) throws Exception {
-        this.server = HttpServer.create(new InetSocketAddress(8081), 0);
+    public WebhookServer(HttpServer server, WidgetSyncService widgetSyncService, DatabaseService databaseService) {
+        this.server = server;
         this.server.createContext("/webhook/github", new WebhookHandler(widgetSyncService, databaseService));
-        this.server.setExecutor(null);
+        log.info("Rota /webhook/github registrada no servidor HTTP");
     }
 
     public void start() {
-        this.server.start();
-        log.info("Servidor de Webhooks iniciado na porta 8081");
+        log.info("Webhook handler ativo (compartilhando servidor HTTP)");
     }
 
     public void stop() {
-        this.server.stop(0);
-        log.info("Servidor de Webhooks parado");
+        log.info("Webhook handler desativado");
     }
 }

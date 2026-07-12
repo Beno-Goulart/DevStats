@@ -16,7 +16,7 @@
         <jackson.version>2.20.0</jackson.version>
         <jda.version>5.6.1</jda.version>
         <logback.version>1.5.18</logback.version>
-        <liquibase.version>4.32.0</liquibase.version>
+        <liquibase.version>4.31.1</liquibase.version>
     </properties>
 
     <dependencies>
@@ -45,12 +45,20 @@
             <version>${logback.version}</version>
         </dependency>
 
-        <!-- SQLite Database -->
+        <!-- SQLite Database (local dev) -->
 
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.50.3.0</version>
+        </dependency>
+
+        <!-- PostgreSQL Database (production) -->
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.4</version>
         </dependency>
 
         <!-- Liquibase Migrations -->

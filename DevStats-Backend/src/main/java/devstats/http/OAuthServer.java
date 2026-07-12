@@ -20,13 +20,17 @@ public class OAuthServer {
         this.server.setExecutor(null);
     }
 
+    public HttpServer getServer() {
+        return this.server;
+    }
+
     public void start() {
         this.server.start();
-        log.info("Servidor OAuth iniciado na porta 8080");
+        log.info("Servidor HTTP iniciado na porta 8080 (OAuth + Webhooks)");
     }
 
     public void stop() {
         this.server.stop(0);
-        log.info("Servidor OAuth parado");
+        log.info("Servidor HTTP parado");
     }
 }

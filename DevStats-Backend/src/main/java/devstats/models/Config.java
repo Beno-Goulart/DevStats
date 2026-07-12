@@ -24,6 +24,8 @@ public class Config {
     public static String CLIENT_SECRET;
     public static String GITHUB_WEBHOOK_SECRET;
     public static int REFRESH_MINUTES = 1;
+    public static String DATABASE_URL;
+    public static String OAUTH_REDIRECT_URI;
 
     static {
         try {
@@ -49,6 +51,19 @@ public class Config {
                     REFRESH_MINUTES = Integer.parseInt(refreshMinutes);
                 } catch (NumberFormatException ignored) {
                 }
+            }
+
+            DATABASE_URL = System.getenv("DATABASE_URL");
+            if (DATABASE_URL == null || DATABASE_URL.isBlank()) {
+                DATABASE_URL = resolve("database.url", properties, envFile);
+            }
+
+            OAUTH_REDIRECT_URI = resolve("oauth.redirect.uri", properties, envFile);
+            if (OAUTH_REDIRECT_URI == null || OAUTH_REDIRECT_URI.isBlank()) {
+                OAUTH_REDIRECT_URI = System.getenv("OAUTH_REDIRECT_URI");
+            }
+            if (OAUTH_REDIRECT_URI == null || OAUTH_REDIRECT_URI.isBlank()) {
+                OAUTH_REDIRECT_URI = "http://localhost:8080/callback";
             }
 
             log.info("Configurações carregadas com sucesso");
@@ -77,7 +92,7 @@ public class Config {
             return new FileInputStream(resourceFile.toFile());
         }
 
-        throw new IllegalStateException("application.properties não encontrado no classpath nem no projeto.");
+        return InputStream.nullInputStream();
     }
 
     private static Map<String, String> loadEnvFile() throws Exception {
@@ -118,25 +133,29 @@ public class Config {
     private static String resolve(String propertyKey, Properties properties, Map<String, String> envFile) {
         String value = properties.getProperty(propertyKey);
 
-        if (value == null) {
-            return null;
+        if (value != null) {
+            if (!value.startsWith("${") || !value.endsWith("}")) {
+                return value;
+            }
+
+            String environmentKey = value.substring(2, value.length() - 1);
+            String environmentValue = System.getenv(environmentKey);
+
+            if (environmentValue != null && !environmentValue.isBlank()) {
+                return environmentValue;
+            }
+
+            String envFileValue = envFile.get(environmentKey);
+
+            if (envFileValue != null && !envFileValue.isBlank()) {
+                return envFileValue;
+            }
         }
 
-        if (!value.startsWith("${") || !value.endsWith("}")) {
-            return value;
-        }
-
-        String environmentKey = value.substring(2, value.length() - 1);
-        String environmentValue = System.getenv(environmentKey);
-
-        if (environmentValue != null && !environmentValue.isBlank()) {
-            return environmentValue;
-        }
-
-        String envFileValue = envFile.get(environmentKey);
-
-        if (envFileValue != null && !envFileValue.isBlank()) {
-            return envFileValue;
+        String envKey = propertyKey.toUpperCase().replace('.', '_');
+        String envValue = System.getenv(envKey);
+        if (envValue != null && !envValue.isBlank()) {
+            return envValue;
         }
 
         return envFile.getOrDefault(propertyKey, "");
