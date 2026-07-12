@@ -24,4 +24,9 @@
         <rollback><sql>SELECT 1</sql></rollback>
     </changeSet>
 
+    <changeSet id="3" author="devstats">
+        <modifyDataType tableName="users" columnName="token_expires_at" newDataType="BIGINT"/>
+        <modifyDataType tableName="users" columnName="last_sync" newDataType="BIGINT"/>
+    </changeSet>
+
 </databaseChangeLog>
