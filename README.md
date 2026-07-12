@@ -79,8 +79,6 @@ Click the button to authorize via OAuth2. Your Discord account is now linked.
 
 ### 5. Add Widget to Your Profile
 
-> **Note:** As of June 2026, Discord restricts widgets to application owners. If you're not the app owner, use the [Widget Identity Creator](https://github.com/chloecinders/widget-identity-creator/releases) (desktop app) to apply your identity, or create your own Discord app.
-
 Widgets v2 is still experimental — you need to enable it manually via DevTools.
 
 #### 5a. Enable the experiment
@@ -96,13 +94,7 @@ webpackChunkdiscord_app.push([[Math.random()], {}, (e) => { if(e.b!=undefined){m
 4. Go to **Settings → Experiments**
 5. Search `2026-03-application-widget-v2-renderer` → set to **Variant 1**
 
-#### 5b. Apply your identity
-
-If you are the **application owner**, the bot's `/widget setup` + `/widget refresh` handles this automatically.
-
-If you are **not the application owner**, download the [Widget Identity Creator](https://github.com/chloecinders/widget-identity-creator/releases) desktop app. It applies your application identity so the widget shows on your profile. You will need your bot token and your Discord user ID.
-
-#### 5c. Register the bot in your widget list
+#### 5b. Register the bot in your widget list
 
 In the Discord Console, paste:
 
@@ -113,7 +105,7 @@ let findByProps=(...e)=>{for(let t of Object.values(_mods))try{if(!t.exports||t.
 findByProps("getFeaturedApplicationIds").getFeaturedApplicationIds().push(bot_id);
 ```
 
-#### 5d. Add the widget
+#### 5c. Add the widget
 
 1. Open your Discord profile
 2. Click **Edit Profile → Add Widget**
@@ -122,6 +114,38 @@ findByProps("getFeaturedApplicationIds").getFeaturedApplicationIds().push(bot_id
 After `/widget refresh` (or auto-sync), your profile will show live GitHub stats.
 
 For the full guide, see [chloecinders.com/blog/discord-widgets](https://chloecinders.com/blog/discord-widgets).
+
+## Widget JSON Structure
+
+The widget payload sent to Discord follows this structure:
+
+```json
+{
+  "data": {
+    "dynamic": [
+      { "type": 1, "name": "full_name",      "value": "Beno Goulart" },
+      { "type": 1, "name": "bio",            "value": "Code-> Commit-> Repeat" },
+      { "type": 3, "name": "profile_img",    "value": { "url": "https://avatars.githubusercontent.com/u/135740382?v=4" } },
+      { "type": 3, "name": "role_img",       "value": { "url": "<URL to role_img.png>" } },
+      { "type": 1, "name": "language",       "value": "Java" },
+      { "type": 3, "name": "java",           "value": { "url": "<URL to java.png>" } },
+      { "type": 1, "name": "active",         "value": "4" },
+      { "type": 1, "name": "commits_today",  "value": "12" },
+      { "type": 1, "name": "last_commit",    "value": "2 min ago" },
+      { "type": 1, "name": "last_repo",      "value": "DevStats" },
+      { "type": 3, "name": "language_icon",  "value": { "url": "<URL to language_icon.png>" } }
+    ]
+  }
+}
+```
+
+| Type | Description |
+|---|---|
+| `1` | Text field — `value` is a string |
+| `2` | Number field — `value` is an integer |
+| `3` | Image field — `value` is an object with a `url` key |
+
+Field names (`name`) must match the Data Field values configured in the Discord Widget Editor for your application.
 
 ## Commands
 
