@@ -61,7 +61,8 @@ public class DatabaseService {
                 StringBuilder jdbcUrl = new StringBuilder("jdbc:postgresql://").append(hostAndRest);
 
                 if (user != null) {
-                    jdbcUrl.append("?user=").append(user);
+                    String separator = hostAndRest.contains("?") ? "&" : "?";
+                    jdbcUrl.append(separator).append("user=").append(user);
                     if (password != null) {
                         jdbcUrl.append("&password=").append(password);
                     }
@@ -81,9 +82,7 @@ public class DatabaseService {
             } catch (ClassNotFoundException e) {
                 throw new SQLException("PostgreSQL driver not found", e);
             }
-            Properties props = new Properties();
-            props.setProperty("sslmode", "require");
-            return DriverManager.getConnection(url, props);
+            return DriverManager.getConnection(url);
         }
         return DriverManager.getConnection(url);
     }
