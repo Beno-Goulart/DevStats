@@ -5,6 +5,9 @@ import com.sun.net.httpserver.HttpHandler;
 import devstats.models.DiscordUser;
 import devstats.services.DatabaseService;
 import devstats.services.OAuthService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URLDecoder;
@@ -14,6 +17,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class OAuthCallbackHandler implements HttpHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(OAuthCallbackHandler.class);
 
     private final OAuthService oAuthService;
     private final DatabaseService databaseService;
@@ -26,7 +31,7 @@ public class OAuthCallbackHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
-            System.out.println("[OAuth] Callback recebido.");
+            log.debug("Callback OAuth recebido");
 
             if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
                 sendResponse(exchange, 405, "Método não permitido.");
@@ -37,27 +42,28 @@ public class OAuthCallbackHandler implements HttpHandler {
             String code = params.get("code");
 
             if (code == null || code.isBlank()) {
-                System.out.println("[OAuth] Erro: Authorization code não encontrado.");
+                log.warn("Authorization code não encontrado no callback");
                 sendResponse(exchange, 400, "<h1>Erro: Código de autorização não encontrado.</h1>");
                 return;
             }
 
-            System.out.println("[OAuth] Code recebido.");
+            log.debug("Code recebido, trocando por token...");
 
             var tokenResponse = oAuthService.exchangeCodeForToken(code);
 
             DiscordUser user = oAuthService.getDiscordUser(tokenResponse.getAccessToken());
 
-            System.out.println("[OAuth] Salvando tokens no banco de dados...");
+            log.debug("Salvando tokens para {} ({})", user.getId(), user.getUsername());
 
             databaseService.saveOAuthTokens(
                     user.getId(),
                     user.getUsername(),
                     tokenResponse.getAccessToken(),
-                    tokenResponse.getRefreshToken()
+                    tokenResponse.getRefreshToken(),
+                    tokenResponse.getExpiresIn()
             );
 
-            System.out.println("[OAuth] Fluxo concluído com sucesso!");
+            log.info("Fluxo OAuth concluído com sucesso para {} ({})", user.getId(), user.getUsername());
 
             String html = "<html><body style='font-family: sans-serif; text-align: center; margin-top: 80px;'>"
                     + "<h1>DevStats conectado com sucesso!</h1>"
@@ -68,8 +74,7 @@ public class OAuthCallbackHandler implements HttpHandler {
             sendResponse(exchange, 200, html);
 
         } catch (Exception e) {
-            System.err.println("[OAuth] Erro no callback: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Erro no callback OAuth: {}", e.getMessage(), e);
             String html = "<html><body style='font-family: sans-serif; text-align: center; margin-top: 80px;'>"
                     + "<h1>Erro ao conectar DevStats</h1>"
                     + "<p>" + escapeHtml(e.getMessage()) + "</p>"

@@ -10,8 +10,12 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WidgetCommand extends ListenerAdapter {
+
+    private static final Logger log = LoggerFactory.getLogger(WidgetCommand.class);
 
     private static final String COMMAND_NAME = "widget";
     private static final String COMMAND_DESCRIPTION = "Comandos do DevStats Widget";
@@ -20,18 +24,24 @@ public class WidgetCommand extends ListenerAdapter {
     private final WidgetRefreshCommand refreshCommand;
     private final WidgetGithubCommand githubCommand;
 
+    private boolean commandsRegistered = false;
+
     public WidgetCommand() {
         this(new WidgetSyncService(), new OAuthService(), new DatabaseService());
     }
 
     public WidgetCommand(WidgetSyncService widgetSyncService, OAuthService oAuthService, DatabaseService databaseService) {
         this.setupCommand = new WidgetSetupCommand(oAuthService);
-        this.refreshCommand = new WidgetRefreshCommand(widgetSyncService, databaseService);
+        this.refreshCommand = new WidgetRefreshCommand(widgetSyncService, databaseService, oAuthService);
         this.githubCommand = new WidgetGithubCommand(databaseService);
     }
 
     @Override
     public void onReady(ReadyEvent event) {
+        if (commandsRegistered) {
+            return;
+        }
+
         event.getJDA().updateCommands()
                 .addCommands(
                         Commands.slash(COMMAND_NAME, COMMAND_DESCRIPTION)
@@ -42,9 +52,10 @@ public class WidgetCommand extends ListenerAdapter {
                                         new SubcommandData("refresh", "Sincroniza seu widget DevStats")
                                 )
                 )
-                .queue();
-
-        System.out.println("Slash Commands do DevStats registrados!");
+                .queue(success -> {
+                    commandsRegistered = true;
+                    log.info("Slash commands registrados com sucesso");
+                });
     }
 
     @Override
@@ -57,6 +68,8 @@ public class WidgetCommand extends ListenerAdapter {
         if (subcommand == null) {
             return;
         }
+
+        log.debug("Comando recebido: /{} {} por {}", COMMAND_NAME, subcommand, event.getUser().getId());
 
         switch (subcommand) {
             case "setup":
