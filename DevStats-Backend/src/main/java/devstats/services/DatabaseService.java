@@ -42,7 +42,32 @@ public class DatabaseService {
         String dbUrl = Config.DATABASE_URL;
         if (dbUrl != null && !dbUrl.isBlank()) {
             if (dbUrl.startsWith("postgresql://")) {
-                dbUrl = "jdbc:" + dbUrl;
+                String withoutScheme = dbUrl.substring("postgresql://".length());
+                String user = null;
+                String password = null;
+                String hostAndRest = withoutScheme;
+
+                if (withoutScheme.contains("@")) {
+                    String userInfo = withoutScheme.substring(0, withoutScheme.indexOf("@"));
+                    hostAndRest = withoutScheme.substring(withoutScheme.indexOf("@") + 1);
+                    if (userInfo.contains(":")) {
+                        user = userInfo.substring(0, userInfo.indexOf(":"));
+                        password = userInfo.substring(userInfo.indexOf(":") + 1);
+                    } else {
+                        user = userInfo;
+                    }
+                }
+
+                StringBuilder jdbcUrl = new StringBuilder("jdbc:postgresql://").append(hostAndRest);
+
+                if (user != null) {
+                    jdbcUrl.append("?user=").append(user);
+                    if (password != null) {
+                        jdbcUrl.append("&password=").append(password);
+                    }
+                }
+
+                return jdbcUrl.toString();
             }
             return dbUrl;
         }
