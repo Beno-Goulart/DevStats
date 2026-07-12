@@ -33,6 +33,11 @@ public class DatabaseService {
         runMigrations();
     }
 
+    public DatabaseService(String url) {
+        this.url = url;
+        runMigrations();
+    }
+
     private static String resolveDatabaseUrl() {
         String dbUrl = Config.DATABASE_URL;
         if (dbUrl != null && !dbUrl.isBlank()) {
