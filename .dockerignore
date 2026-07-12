@@ -1,0 +1,10 @@
+.env
+target/
+*.db
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.DS_Store
+docs/devstats.db

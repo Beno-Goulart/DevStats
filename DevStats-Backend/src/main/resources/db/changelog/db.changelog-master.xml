@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="1" author="devstats">
+        <createTable tableName="users">
+            <column name="discord_id" type="TEXT">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="discord_username" type="TEXT"/>
+            <column name="github_username" type="TEXT"/>
+            <column name="discord_access_token" type="TEXT"/>
+            <column name="refresh_token" type="TEXT"/>
+            <column name="token_expires_at" type="INTEGER"/>
+            <column name="last_sync" type="INTEGER"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="2" author="devstats">
+        <sql>SELECT 1</sql>
+        <rollback><sql>SELECT 1</sql></rollback>
+    </changeSet>
+
+</databaseChangeLog>

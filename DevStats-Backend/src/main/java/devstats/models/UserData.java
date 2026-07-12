@@ -3,19 +3,23 @@ package devstats.models;
 public class UserData {
 
     private String discordId;
+    private String discordUsername;
     private String githubUsername;
     private String discordAccessToken;
     private String refreshToken;
+    private Long tokenExpiresAt;
     private Long lastSync;
 
     public UserData() {
     }
 
-    public UserData(String discordId, String githubUsername, String discordAccessToken, String refreshToken, Long lastSync) {
+    public UserData(String discordId, String discordUsername, String githubUsername, String discordAccessToken, String refreshToken, Long tokenExpiresAt, Long lastSync) {
         this.discordId = discordId;
+        this.discordUsername = discordUsername;
         this.githubUsername = githubUsername;
         this.discordAccessToken = discordAccessToken;
         this.refreshToken = refreshToken;
+        this.tokenExpiresAt = tokenExpiresAt;
         this.lastSync = lastSync;
     }
 
@@ -25,6 +29,14 @@ public class UserData {
 
     public void setDiscordId(String discordId) {
         this.discordId = discordId;
+    }
+
+    public String getDiscordUsername() {
+        return discordUsername;
+    }
+
+    public void setDiscordUsername(String discordUsername) {
+        this.discordUsername = discordUsername;
     }
 
     public String getGithubUsername() {
@@ -51,11 +63,23 @@ public class UserData {
         this.refreshToken = refreshToken;
     }
 
+    public Long getTokenExpiresAt() {
+        return tokenExpiresAt;
+    }
+
+    public void setTokenExpiresAt(Long tokenExpiresAt) {
+        this.tokenExpiresAt = tokenExpiresAt;
+    }
+
     public Long getLastSync() {
         return lastSync;
     }
 
     public void setLastSync(Long lastSync) {
         this.lastSync = lastSync;
+    }
+
+    public boolean isTokenExpired() {
+        return tokenExpiresAt == null || System.currentTimeMillis() >= tokenExpiresAt;
     }
 }

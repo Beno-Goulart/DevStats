@@ -3,9 +3,12 @@ package devstats.commands;
 import devstats.services.DatabaseService;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WidgetGithubCommand {
+
+    private static final Logger log = LoggerFactory.getLogger(WidgetGithubCommand.class);
 
     private final DatabaseService databaseService;
 
@@ -27,6 +30,8 @@ public class WidgetGithubCommand {
         String githubUsername = option.getAsString();
 
         databaseService.updateGithub(discordId, githubUsername);
+
+        log.info("GitHub username definido: {} -> {}", discordId, githubUsername);
 
         event.reply("GitHub username definido como: **" + githubUsername + "**")
                 .setEphemeral(true)

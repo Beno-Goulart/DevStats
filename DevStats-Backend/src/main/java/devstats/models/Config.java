@@ -1,5 +1,8 @@
 package devstats.models;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -10,26 +13,20 @@ import java.util.Properties;
 
 public class Config {
 
+    private static final Logger log = LoggerFactory.getLogger(Config.class);
+
     public static String BOT_TOKEN;
-
     public static String APPLICATION_ID;
-
     public static String USER_ID;
-
     public static String GITHUB_USERNAME;
-
     public static String GITHUB_TOKEN;
-
     public static String ACCESS_TOKEN;
-
     public static String CLIENT_SECRET;
-
-
+    public static String GITHUB_WEBHOOK_SECRET;
+    public static int REFRESH_MINUTES = 1;
 
     static {
-
         try {
-
             Properties properties = new Properties();
             Map<String, String> envFile = loadEnvFile();
 
@@ -38,27 +35,30 @@ public class Config {
             }
 
             BOT_TOKEN = resolve("discord.bot.token", properties, envFile);
-
             APPLICATION_ID = resolve("discord.application.id", properties, envFile);
-
             USER_ID = resolve("discord.user.id", properties, envFile);
-
             GITHUB_USERNAME = resolve("github.username", properties, envFile);
-
             GITHUB_TOKEN = resolve("github.token", properties, envFile);
-
             CLIENT_SECRET = resolve("discord.client.secret", properties, envFile);
+            ACCESS_TOKEN = resolve("discord.access.token", properties, envFile);
+            GITHUB_WEBHOOK_SECRET = resolve("github.webhook.secret", properties, envFile);
+
+            String refreshMinutes = resolve("widget.refresh.minutes", properties, envFile);
+            if (refreshMinutes != null && !refreshMinutes.isBlank()) {
+                try {
+                    REFRESH_MINUTES = Integer.parseInt(refreshMinutes);
+                } catch (NumberFormatException ignored) {
+                }
+            }
+
+            log.info("Configurações carregadas com sucesso");
 
         } catch (Exception e) {
-
             throw new RuntimeException(e);
-
         }
-
     }
 
     private static InputStream openProperties() throws Exception {
-
         InputStream resource = Config.class
                 .getClassLoader()
                 .getResourceAsStream("application.properties");
@@ -68,23 +68,19 @@ public class Config {
         }
 
         Path localFile = Path.of("application.properties");
-
         if (Files.exists(localFile)) {
             return new FileInputStream(localFile.toFile());
         }
 
         Path resourceFile = Path.of("src", "main", "resources", "application.properties");
-
         if (Files.exists(resourceFile)) {
             return new FileInputStream(resourceFile.toFile());
         }
 
         throw new IllegalStateException("application.properties não encontrado no classpath nem no projeto.");
-
     }
 
     private static Map<String, String> loadEnvFile() throws Exception {
-
         Map<String, String> values = new HashMap<>();
         Path envPath = findEnvFile();
 
@@ -93,42 +89,33 @@ public class Config {
         }
 
         for (String line : Files.readAllLines(envPath)) {
-
             String trimmed = line.trim();
-
             if (trimmed.isEmpty() || trimmed.startsWith("#") || !trimmed.contains("=")) {
                 continue;
             }
-
             String[] parts = trimmed.split("=", 2);
             values.put(parts[0].trim(), unquote(parts[1].trim()));
-
         }
 
+        log.debug("Arquivo .env carregado: {} variáveis", values.size());
         return values;
-
     }
 
     private static Path findEnvFile() {
-
         Path localFile = Path.of(".env");
-
         if (Files.exists(localFile)) {
             return localFile;
         }
 
         Path backendFile = Path.of("DevStats-Backend", ".env");
-
         if (Files.exists(backendFile)) {
             return backendFile;
         }
 
         return null;
-
     }
 
     private static String resolve(String propertyKey, Properties properties, Map<String, String> envFile) {
-
         String value = properties.getProperty(propertyKey);
 
         if (value == null) {
@@ -153,11 +140,9 @@ public class Config {
         }
 
         return envFile.getOrDefault(propertyKey, "");
-
     }
 
     private static String unquote(String value) {
-
         if (
                 value.length() >= 2 &&
                         (
@@ -169,7 +154,5 @@ public class Config {
         }
 
         return value;
-
     }
-
 }
