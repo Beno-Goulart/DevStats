@@ -23,6 +23,7 @@ public class WidgetCommand extends ListenerAdapter {
     private final WidgetSetupCommand setupCommand;
     private final WidgetRefreshCommand refreshCommand;
     private final WidgetGithubCommand githubCommand;
+    private final WidgetUnlinkCommand unlinkCommand;
 
     private boolean commandsRegistered = false;
 
@@ -34,6 +35,7 @@ public class WidgetCommand extends ListenerAdapter {
         this.setupCommand = new WidgetSetupCommand(oAuthService);
         this.refreshCommand = new WidgetRefreshCommand(widgetSyncService, databaseService, oAuthService);
         this.githubCommand = new WidgetGithubCommand(databaseService);
+        this.unlinkCommand = new WidgetUnlinkCommand(databaseService);
     }
 
     @Override
@@ -49,7 +51,8 @@ public class WidgetCommand extends ListenerAdapter {
                                         new SubcommandData("setup", "Configura seu widget DevStats"),
                                         new SubcommandData("github", "Define seu nome de usuário do GitHub")
                                                 .addOptions(new OptionData(OptionType.STRING, "username", "Seu nome de usuário do GitHub", true)),
-                                        new SubcommandData("refresh", "Sincroniza seu widget DevStats")
+                                        new SubcommandData("refresh", "Sincroniza seu widget DevStats"),
+                                        new SubcommandData("unlink", "Desvincula sua conta e remove dados do widget")
                                 )
                 )
                 .queue(success -> {
@@ -80,6 +83,9 @@ public class WidgetCommand extends ListenerAdapter {
                 break;
             case "refresh":
                 refreshCommand.execute(event);
+                break;
+            case "unlink":
+                unlinkCommand.execute(event);
                 break;
             default:
                 event.reply("Subcomando desconhecido.")

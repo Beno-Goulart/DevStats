@@ -245,6 +245,18 @@ public class DatabaseService {
         }
     }
 
+    public void deleteUser(String discordId) {
+        String sql = "DELETE FROM users WHERE discord_id = ?;";
+        try (Connection conn = connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, discordId);
+            pstmt.executeUpdate();
+            log.info("Usuário deletado: {}", discordId);
+        } catch (SQLException e) {
+            log.error("Erro ao deletar usuário {}: {}", discordId, e.getMessage());
+        }
+    }
+
     public void close() {
         try {
             var conn = connect();
