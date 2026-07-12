@@ -120,6 +120,23 @@ Your Discord profile now shows your live GitHub stats.
 
 See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed diagrams (Mermaid).
 
+### Knowledge Graph (Graphify)
+
+341 nodes · 807 edges · 17 communities detected.
+
+| God Node | Edges | Role |
+|---|---|---|
+| `DatabaseService` | 42 | DB access hub |
+| `GithubProfile` | 28 | GitHub data DTO |
+| `UserData` | 27 | DB entity |
+| `OAuthService` | 23 | Discord OAuth2 |
+| `WidgetSyncService` | 18 | Orchestrator |
+| `GithubService` | 16 | GitHub API client |
+
+Open [graphify-out/graph.html](./graphify-out/graph.html) in your browser for an **interactive force-directed visualization** — click nodes to explore connections, filter by community.
+
+See [graphify-out/GRAPH_REPORT.md](./graphify-out/GRAPH_REPORT.md) for the full report.
+
 ## Deploy
 
 ### Fly.io (Production)
