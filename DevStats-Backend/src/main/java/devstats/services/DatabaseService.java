@@ -41,6 +41,9 @@ public class DatabaseService {
     private static String resolveDatabaseUrl() {
         String dbUrl = Config.DATABASE_URL;
         if (dbUrl != null && !dbUrl.isBlank()) {
+            if (dbUrl.startsWith("postgresql://")) {
+                dbUrl = "jdbc:" + dbUrl;
+            }
             return dbUrl;
         }
         return "jdbc:sqlite:devstats.db";
