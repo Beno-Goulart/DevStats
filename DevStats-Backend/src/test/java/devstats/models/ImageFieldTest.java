@@ -2,6 +2,8 @@ package devstats.models;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class ImageFieldTest {
@@ -11,7 +13,7 @@ class ImageFieldTest {
         ImageField field = new ImageField(3, "avatar", "https://example.com/img.png");
         assertEquals(3, field.getType());
         assertEquals("avatar", field.getName());
-        assertEquals("https://example.com/img.png", field.getValue());
+        assertEquals(Map.of("url", "https://example.com/img.png"), field.getValue());
     }
 
     @Test
