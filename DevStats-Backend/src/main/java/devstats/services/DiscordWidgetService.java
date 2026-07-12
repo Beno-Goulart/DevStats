@@ -55,11 +55,33 @@ public class DiscordWidgetService {
         headers.put("Content-Type", "application/json");
         headers.put("Accept", "application/json");
 
-        String url = profileUrl(userId);
-        String response = HttpUtils.patch(url, json, headers);
+        try {
+            String url = profileUrl(userId);
+            String response = HttpUtils.patch(url, json, headers);
+            log.info("Widget sincronizado para {} com sucesso", userId);
+            log.debug("Resposta Discord: {}", response);
+        } catch (RuntimeException e) {
+            if (e.getMessage() != null && e.getMessage().contains("40106")) {
+                log.warn("Identity já existe para outro usuário, deletando identity 0 para {}...", userId);
+                deleteIdentity(userId, headers);
+                String url = profileUrl(userId);
+                String response = HttpUtils.patch(url, json, headers);
+                log.info("Widget sincronizado para {} após delete+recreate", userId);
+                log.debug("Resposta Discord: {}", response);
+            } else {
+                throw e;
+            }
+        }
+    }
 
-        log.info("Widget sincronizado para {} com sucesso", userId);
-        log.debug("Resposta Discord: {}", response);
+    private void deleteIdentity(String userId, Map<String, String> headers) {
+        try {
+            String url = identitiesUrl(userId);
+            HttpUtils.delete(url, headers);
+            log.info("Identity deletada para {}", userId);
+        } catch (Exception e) {
+            log.warn("Falha ao deletar identity para {}: {}", userId, e.getMessage());
+        }
     }
 
     private WidgetPayload buildPayload(GithubProfile profile) {
@@ -109,5 +131,14 @@ public class DiscordWidgetService {
                 + "/users/"
                 + userId
                 + "/identities/0/profile";
+    }
+
+    private String identitiesUrl(String userId) {
+        return API
+                + "/applications/"
+                + Config.APPLICATION_ID
+                + "/users/"
+                + userId
+                + "/identities/0";
     }
 }

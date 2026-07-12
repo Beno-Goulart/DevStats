@@ -35,6 +35,16 @@ public final class HttpUtils {
         return response.body();
     }
 
+    public static void delete(String url, Map<String, String> headers) throws Exception {
+        HttpRequest request = buildRequest(url, "DELETE", null, headers);
+        HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() >= 400) {
+            log.debug("DELETE {} retornou {}: {}", url, response.statusCode(), response.body());
+        }
+    }
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(HttpUtils.class);
+
     public static <T> T getJson(String url, Map<String, String> headers, Class<T> type) throws Exception {
         String body = get(url, headers);
         return JsonUtils.fromJson(body, type);
@@ -61,13 +71,12 @@ public final class HttpUtils {
 
         if (body != null) {
             if ("PATCH".equals(method)) {
-                if (headers != null && headers.containsKey("Content-Type")) {
-                    // Content-Type already set
-                }
                 builder.method("PATCH", HttpRequest.BodyPublishers.ofString(body));
             } else {
                 builder.POST(HttpRequest.BodyPublishers.ofString(body));
             }
+        } else if ("DELETE".equals(method)) {
+            builder.DELETE();
         } else {
             builder.GET();
         }
