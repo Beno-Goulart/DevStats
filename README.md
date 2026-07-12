@@ -117,6 +117,28 @@ After `/widget refresh` (or auto-sync), your profile will show live GitHub stats
 
 For the full guide, see [chloecinders.com/blog/discord-widgets](https://chloecinders.com/blog/discord-widgets).
 
+#### 5d. Share the Widget — Export / Import
+
+Anyone with their own Discord Application can use the same widget layout. The visual config is exported as a single JSON file in [`widget-config.json`](DevStats-Backend/src/main/resources/widget-config.json).
+
+**To import into your app:**
+
+1. Go to [Discord Developer Portal](https://discord.com/developers/applications) → your application
+2. Open **DevTools** in the Discord client (`Ctrl + Shift + I`)
+3. In the Console, paste the contents of `widget-config.json` and run:
+
+```js
+// Replace WIDGET_CONFIG with the full JSON from widget-config.json
+let WIDGET_CONFIG = { "_type": "discord_widget_config", ... };
+
+let _mods=webpackChunkdiscord_app.push([[Symbol()],{},e=>e.c]);webpackChunkdiscord_app.pop();
+let findByProps=(...e)=>{for(let t of Object.values(_mods))try{if(!t.exports||t.exports===window)continue;if(e.every(e=>t.exports?.[e]))return t.exports;for(let r in t.exports)if(e.every(e=>t.exports?.[r]?.[e])&&"IntlMessagesProxy"!==t.exports[r][Symbol.toStringTag])return t.exports[r]}catch{}};
+findByProps("updateDeveloperSettingsApplication").updateDeveloperSettingsApplication("YOUR_APP_ID", {widgetConfig: WIDGET_CONFIG});
+```
+
+4. Replace `YOUR_APP_ID` with your application's ID
+5. The widget layout (icons, data bindings, surfaces) will be applied to your app
+
 ## Widget JSON Structure
 
 The widget payload sent to Discord follows this structure:

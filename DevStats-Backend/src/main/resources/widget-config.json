@@ -1,0 +1,273 @@
+{
+  "_type": "discord_widget_config",
+  "surfaces": {
+    "widget_bottom": {
+      "layout": "widget_bottom_collection",
+      "components": {
+        "item_1": {
+          "fields": {
+            "description": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "active",
+              "fallback": {
+                "value_type": "custom_string",
+                "presentation_type": "text",
+                "value": "No active repositories"
+              }
+            },
+            "image": {
+              "value_type": "application_asset",
+              "presentation_type": "image",
+              "value": "furnace"
+            },
+            "name": {
+              "value_type": "custom_string",
+              "presentation_type": "text",
+              "value": "Active Repositories:"
+            }
+          }
+        },
+        "item_2": {
+          "fields": {
+            "description": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "commits_today",
+              "fallback": {
+                "value_type": "custom_string",
+                "presentation_type": "text",
+                "value": "Nothing yet"
+              }
+            },
+            "image": {
+              "value_type": "application_asset",
+              "presentation_type": "image",
+              "value": "craft"
+            },
+            "name": {
+              "value_type": "custom_string",
+              "presentation_type": "text",
+              "value": "Commits Today:"
+            }
+          }
+        },
+        "item_3": {
+          "fields": {
+            "description": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "last_repo",
+              "fallback": {
+                "value_type": "custom_string",
+                "presentation_type": "text",
+                "value": "Unknown"
+              }
+            },
+            "image": {
+              "value_type": "application_asset",
+              "presentation_type": "image",
+              "value": "chest"
+            },
+            "name": {
+              "value_type": "custom_string",
+              "presentation_type": "text",
+              "value": "Last Repositorie:"
+            }
+          }
+        },
+        "item_4": {
+          "fields": {
+            "description": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "last_commit",
+              "fallback": {
+                "value_type": "custom_string",
+                "presentation_type": "text",
+                "value": "No recent commits"
+              }
+            },
+            "image": {
+              "value_type": "application_asset",
+              "presentation_type": "image",
+              "value": "Clock_JE3_BE3"
+            },
+            "name": {
+              "value_type": "custom_string",
+              "presentation_type": "text",
+              "value": "Last Commit"
+            }
+          }
+        }
+      }
+    },
+    "mini_profile": {
+      "layout": "mini_profile_hero_stat",
+      "components": {
+        "stat": {
+          "fields": {
+            "text": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "last_commit",
+              "fallback": {
+                "value_type": "custom_string",
+                "presentation_type": "text",
+                "value": "No recent commits"
+              }
+            },
+            "icon": {
+              "value_type": "application_asset",
+              "presentation_type": "image",
+              "value": "Clock_JE3_BE3"
+            },
+            "label": {
+              "value_type": "custom_string",
+              "presentation_type": "text",
+              "value": "Last Commit"
+            }
+          }
+        },
+        "hero_image": {
+          "fields": {
+            "image": {
+              "value_type": "data",
+              "presentation_type": "image",
+              "value": "profile_img",
+              "fallback": {
+                "value_type": "application_asset",
+                "presentation_type": "image",
+                "value": "Reach-GIF"
+              }
+            }
+          }
+        }
+      }
+    },
+    "widget_top": {
+      "layout": "widget_top_hero",
+      "components": {
+        "title": {
+          "fields": {
+            "text": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "full_name",
+              "fallback": {
+                "value_type": "custom_string",
+                "presentation_type": "text",
+                "value": "GitHub User"
+              }
+            }
+          }
+        },
+        "subtitle_1": {
+          "fields": {
+            "text": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "bio",
+              "fallback": {
+                "value_type": "custom_string",
+                "presentation_type": "text",
+                "value": "Code-> Commit-> Repeat"
+              }
+            },
+            "icon": {
+              "value_type": "application_asset",
+              "presentation_type": "image",
+              "value": "favicon__1_"
+            }
+          }
+        },
+        "hero_image": {
+          "fields": {
+            "image": {
+              "value_type": "data",
+              "presentation_type": "image",
+              "value": "profile_img",
+              "fallback": {
+                "value_type": "application_asset",
+                "presentation_type": "image",
+                "value": "Reach-GIF"
+              }
+            }
+          }
+        },
+        "subtitle_2": {
+          "fields": {
+            "text": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "language",
+              "fallback": {
+                "value_type": "custom_string",
+                "presentation_type": "text",
+                "value": "Code-> Commit-> Repeat"
+              }
+            },
+            "icon": {
+              "value_type": "data",
+              "presentation_type": "image",
+              "value": "language_icon",
+              "fallback": {
+                "value_type": "application_asset",
+                "presentation_type": "image",
+                "value": "pixel-art-retro-computer"
+              }
+            }
+          }
+        }
+      }
+    },
+    "add_widget_preview": {
+      "layout": "add_widget_preview_contained",
+      "components": {
+        "contained_image": {
+          "fields": {
+            "image": {
+              "value_type": "application_asset",
+              "presentation_type": "image",
+              "value": "Reach-GIF"
+            }
+          }
+        }
+      }
+    },
+    "activity_accessory": {
+      "layout": "activity_accessory_stat",
+      "components": {
+        "stat": {
+          "fields": {
+            "text": {
+              "value_type": "data",
+              "presentation_type": "text",
+              "value": "last_commit",
+              "fallback": {
+                "value_type": "custom_string",
+                "presentation_type": "text",
+                "value": "No recent commits"
+              }
+            },
+            "icon": {
+              "value_type": "data",
+              "presentation_type": "image",
+              "value": "profile_img",
+              "fallback": {
+                "value_type": "application_asset",
+                "presentation_type": "image",
+                "value": "Reach-GIF"
+              }
+            },
+            "label": {
+              "value_type": "custom_string",
+              "presentation_type": "text",
+              "value": "Last Commit"
+            }
+          }
+        }
+      }
+    }
+  }
+}
