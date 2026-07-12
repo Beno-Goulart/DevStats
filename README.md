@@ -77,7 +77,41 @@ Click the button to authorize via OAuth2. Your Discord account is now linked.
 /widget refresh
 ```
 
-Your Discord profile now shows your live GitHub stats.
+### 5. Add Widget to Your Profile
+
+Widgets v2 is still experimental — you need to enable it manually via DevTools.
+
+#### 5a. Enable the experiment
+
+1. Open Discord in your **browser** (or desktop with DevTools enabled)
+2. Press `Ctrl + Shift + I` → **Console** tab
+3. Paste and run this snippet to unlock the experiments page:
+
+```js
+webpackChunkdiscord_app.push([[Math.random()], {}, (e) => { if(e.b!=undefined){module = Object.values(e.c).find(x => x?.exports?.default?.getUsers && x.exports.default._dispatcher._actionHandlers).exports.default;} }]); nodes = Object.values(module._dispatcher._actionHandlers._dependencyGraph.nodes); try { nodes.find(x => x.name == "ExperimentStore").actionHandler["OVERLAY_INITIALIZE"]({}); } catch (e) { } original = [module.getCurrentUser, module.getNonImpersonatedCurrentUser]; module.getCurrentUser = module.getNonImpersonatedCurrentUser = () => ({ isStaff: () => true }); nodes.find(x => x.name == "DeveloperExperimentStore").actionHandler["OVERLAY_INITIALIZE"]({}); [module.getCurrentUser, module.getNonImpersonatedCurrentUser] = original;
+```
+
+4. Go to **Settings → Experiments**
+5. Search `2026-03-application-widget-v2-renderer` → set to **Variant 1**
+
+#### 5b. Register the bot in your widget list
+
+In the Discord Console, paste:
+
+```js
+let bot_id = "1520821686436630528";
+let _mods=webpackChunkdiscord_app.push([[Symbol()],{},e=>e.c]);webpackChunkdiscord_app.pop();
+let findByProps=(...e)=>{for(let t of Object.values(_mods))try{if(!t.exports||t.exports===window)continue;if(e.every(e=>t.exports?.[e]))return t.exports;for(let r in t.exports)if(e.every(e=>t.exports?.[r]?.[e])&&"IntlMessagesProxy"!==t.exports[r][Symbol.toStringTag])return t.exports[r]}catch{}};
+findByProps("getFeaturedApplicationIds").getFeaturedApplicationIds().push(bot_id);
+```
+
+#### 5c. Add the widget
+
+1. Open your Discord profile
+2. Click **Edit Profile → Add Widget**
+3. Select **DevStats** from the list
+
+After `/widget refresh` (or auto-sync), your profile will show live GitHub stats.
 
 ## Commands
 
@@ -86,6 +120,7 @@ Your Discord profile now shows your live GitHub stats.
 | `/widget setup` | Start the OAuth2 flow to connect your Discord account |
 | `/widget github <username>` | Set your GitHub username |
 | `/widget refresh` | Manually sync your widget with the latest GitHub data |
+| `/widget unlink` | Remove your identity and unlink your account |
 
 ## Architecture
 
