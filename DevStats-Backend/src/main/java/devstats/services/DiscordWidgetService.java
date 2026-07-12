@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import devstats.models.Config;
 import devstats.models.DynamicField;
 import devstats.models.GithubProfile;
-import devstats.models.ImageField;
 import devstats.models.WidgetData;
 import devstats.models.WidgetPayload;
 import devstats.utils.HttpUtils;
@@ -69,7 +68,9 @@ public class DiscordWidgetService {
         List<DynamicField> dynamicFields = buildDynamicFields(profile);
 
         if (profile.getAvatarUrl() != null && !profile.getAvatarUrl().isBlank()) {
-            dynamicFields.add(new ImageField(IMAGE, AVATAR, profile.getAvatarUrl()));
+            Map<String, String> imageValue = new LinkedHashMap<>();
+            imageValue.put("url", profile.getAvatarUrl());
+            dynamicFields.add(new DynamicField(IMAGE, AVATAR, imageValue));
         }
 
         payload.setData(new WidgetData(dynamicFields));

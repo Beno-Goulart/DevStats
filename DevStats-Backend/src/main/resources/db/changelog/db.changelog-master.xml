@@ -24,4 +24,26 @@
         <rollback><sql>SELECT 1</sql></rollback>
     </changeSet>
 
+    <changeSet id="3" author="devstats">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="users" columnName="token_expires_at"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="users">
+            <column name="token_expires_at" type="INTEGER"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="4" author="devstats">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="users" columnName="last_sync"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="users">
+            <column name="last_sync" type="INTEGER"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
