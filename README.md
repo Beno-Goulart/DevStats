@@ -28,6 +28,8 @@
 
 DevStats is a Discord bot that displays your **real-time GitHub activity** directly on your Discord profile using the Discord Social SDK (Widgets v2). It syncs automatically — your profile always reflects what you're actually building.
 
+> **Note:** Discord Widgets v2 are experimental and currently restricted to the application owner's profile only. However, the entire DevStats infrastructure is already built to support multi-user widgets the moment Discord enables widget sharing — making it easy for anyone who wants this widget on their profile. **[Star this repo](https://github.com/Beno-Goulart/DevStats/stargazers)** to stay updated.
+
 ## Preview
 
 <p align="center">
