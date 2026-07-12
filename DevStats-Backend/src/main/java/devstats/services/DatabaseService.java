@@ -19,6 +19,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class DatabaseService {
 
@@ -27,17 +28,31 @@ public class DatabaseService {
     private final String url;
 
     public DatabaseService() {
-        this("jdbc:sqlite:devstats.db");
+        this.url = resolveDatabaseUrl();
+        log.info("Database scheme: {}", url.contains("://") ? url.substring(0, url.indexOf("://") + 3) : "sqlite");
+        runMigrations();
     }
 
-    public DatabaseService(String url) {
-        this.url = url;
-        runMigrations();
+    private static String resolveDatabaseUrl() {
+        String dbUrl = Config.DATABASE_URL;
+        if (dbUrl != null && !dbUrl.isBlank()) {
+            return dbUrl;
+        }
+        return "jdbc:sqlite:devstats.db";
+    }
+
+    private Connection connect() throws SQLException {
+        if (url.startsWith("jdbc:postgresql:")) {
+            Properties props = new Properties();
+            props.setProperty("sslmode", "require");
+            return DriverManager.getConnection(url, props);
+        }
+        return DriverManager.getConnection(url);
     }
 
     private void runMigrations() {
         try {
-            Connection conn = DriverManager.getConnection(url);
+            Connection conn = connect();
             Database database = DatabaseFactory.getInstance()
                     .findCorrectDatabaseImplementation(new JdbcConnection(conn));
             Liquibase liquibase = new Liquibase(
@@ -51,10 +66,6 @@ public class DatabaseService {
         } catch (Exception e) {
             log.error("Erro ao executar migrations: {}", e.getMessage(), e);
         }
-    }
-
-    private Connection connect() throws SQLException {
-        return DriverManager.getConnection(url);
     }
 
     public void saveUser(UserData user) {

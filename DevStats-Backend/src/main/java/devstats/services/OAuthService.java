@@ -18,7 +18,10 @@ public class OAuthService {
 
     private static final String TOKEN_URL = "https://discord.com/api/v10/oauth2/token";
     private static final String USER_URL = "https://discord.com/api/v10/users/@me";
-    private static final String REDIRECT_URI = "http://localhost:8080/callback";
+
+    private String getRedirectUri() {
+        return Config.OAUTH_REDIRECT_URI;
+    }
 
     public String generateAuthorizationUrl() {
         String clientId = Config.APPLICATION_ID;
@@ -26,7 +29,7 @@ public class OAuthService {
             clientId = "1509844130082062396";
         }
 
-        String encodedRedirect = URLEncoder.encode(REDIRECT_URI, StandardCharsets.UTF_8);
+        String encodedRedirect = URLEncoder.encode(getRedirectUri(), StandardCharsets.UTF_8);
         String scope = URLEncoder.encode("identify role_connections.write", StandardCharsets.UTF_8);
 
         return "https://discord.com/oauth2/authorize" +
@@ -44,7 +47,7 @@ public class OAuthService {
         params.put("client_secret", Config.CLIENT_SECRET);
         params.put("grant_type", "authorization_code");
         params.put("code", code);
-        params.put("redirect_uri", REDIRECT_URI);
+        params.put("redirect_uri", getRedirectUri());
 
         String formBody = HttpUtils.encodeFormBody(params);
         Map<String, String> headers = Map.of("Content-Type", "application/x-www-form-urlencoded");

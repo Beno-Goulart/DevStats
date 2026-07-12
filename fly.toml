@@ -1,12 +1,8 @@
-# fly.toml app configuration file generated for devstats on 2026-07-12T13:50:58Z
-#
-# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
-#
-
 app = 'devstats'
 primary_region = 'ams'
 
 [build]
+  dockerfile = 'Dockerfile'
 
 [http_service]
   internal_port = 8080
@@ -16,8 +12,12 @@ primary_region = 'ams'
   min_machines_running = 0
   processes = ['app']
 
+  [http_service.concurrency]
+    type = 'connections'
+    hard_limit = 25
+    soft_limit = 20
+
 [[vm]]
-  memory = '1gb'
+  memory = '256mb'
   cpu_kind = 'shared'
   cpus = 1
-  memory_mb = 256

@@ -45,13 +45,13 @@ public class Main {
         oauthServer = new OAuthServer(oAuthService, databaseService);
         oauthServer.start();
 
-        webhookServer = new WebhookServer(widgetSyncService, databaseService);
+        webhookServer = new WebhookServer(oauthServer.getServer(), widgetSyncService, databaseService);
         webhookServer.start();
 
         autoSyncService = new AutoSyncService(widgetSyncService, databaseService);
         autoSyncService.start();
 
-        log.info("Servidores HTTP iniciados (OAuth: 8080, Webhooks: 8081)");
+        log.info("Servidor HTTP ativo na porta 8080 (rotas: /callback, /webhook/github)");
         log.info("Auto-sync ativo (intervalo: {} min)", Config.REFRESH_MINUTES);
     }
 
