@@ -51,6 +51,11 @@ public class DatabaseService {
 
     private Connection connect() throws SQLException {
         if (url.startsWith("jdbc:postgresql:")) {
+            try {
+                Class.forName("org.postgresql.Driver");
+            } catch (ClassNotFoundException e) {
+                throw new SQLException("PostgreSQL driver not found", e);
+            }
             Properties props = new Properties();
             props.setProperty("sslmode", "require");
             return DriverManager.getConnection(url, props);
