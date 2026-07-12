@@ -53,9 +53,7 @@ DevStats is a Discord bot that displays your **real-time GitHub activity** direc
 
 ### 1. Invite the Bot
 
-> **Authorization URL:** `https://discord.com/oauth2/authorize?client_id=YOUR_APP_ID`
-
-Grant the required scopes: `identify`, `role_connections.write`.
+> **[Invite Bot](https://discord.com/oauth2/authorize?client_id=1520821686436630528&permissions=8&integration_type=0&scope=bot+applications.commands)**
 
 ### 2. Connect Your GitHub
 
