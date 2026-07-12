@@ -1,0 +1,197 @@
+{
+  ".github/modernize/java-upgrade/hooks/scripts/recordToolUse.ps1": {
+    "mtime": 1783861614.475623,
+    "ast_hash": "9ecf230451dfd20ff4e0a2a01e80a4e6",
+    "semantic_hash": "9ecf230451dfd20ff4e0a2a01e80a4e6"
+  },
+  ".github/modernize/java-upgrade/hooks/scripts/recordToolUse.sh": {
+    "mtime": 1783861614.4851446,
+    "ast_hash": "e25ae501603ce6bf738198f5ce32ba83",
+    "semantic_hash": "e25ae501603ce6bf738198f5ce32ba83"
+  },
+  "DevStats-Backend/mvnw": {
+    "mtime": 1783864113.7085898,
+    "ast_hash": "eaccdff4005d934ec5560ac60645c353",
+    "semantic_hash": "eaccdff4005d934ec5560ac60645c353"
+  },
+  "DevStats-Backend/pom.xml": {
+    "mtime": 1783870724.8465478,
+    "ast_hash": "c45e2847e630f682fac89e6ba642c637",
+    "semantic_hash": "c45e2847e630f682fac89e6ba642c637"
+  },
+  "DevStats-Backend/src/main/java/devstats/Main.java": {
+    "mtime": 1783864753.556082,
+    "ast_hash": "52a951687150685bd0e6670f9f4dae74",
+    "semantic_hash": "52a951687150685bd0e6670f9f4dae74"
+  },
+  "DevStats-Backend/src/main/java/devstats/commands/WidgetCommand.java": {
+    "mtime": 1783864113.715112,
+    "ast_hash": "bb45706d59467145f0f132e59be83db6",
+    "semantic_hash": "bb45706d59467145f0f132e59be83db6"
+  },
+  "DevStats-Backend/src/main/java/devstats/commands/WidgetGithubCommand.java": {
+    "mtime": 1783864113.717111,
+    "ast_hash": "1e50c6bbf34a01a8c02d520d91729759",
+    "semantic_hash": "1e50c6bbf34a01a8c02d520d91729759"
+  },
+  "DevStats-Backend/src/main/java/devstats/commands/WidgetRefreshCommand.java": {
+    "mtime": 1783864113.7181127,
+    "ast_hash": "d16104e46ff17bbf87dfc86313ebb163",
+    "semantic_hash": "d16104e46ff17bbf87dfc86313ebb163"
+  },
+  "DevStats-Backend/src/main/java/devstats/commands/WidgetSetupCommand.java": {
+    "mtime": 1783804023.3636343,
+    "ast_hash": "232b2d08df2c083a0e9000833c24bc20",
+    "semantic_hash": "232b2d08df2c083a0e9000833c24bc20"
+  },
+  "DevStats-Backend/src/main/java/devstats/http/OAuthCallbackHandler.java": {
+    "mtime": 1783864113.71911,
+    "ast_hash": "26217e3ee1f7b5e815de4bf68c55ccd9",
+    "semantic_hash": "26217e3ee1f7b5e815de4bf68c55ccd9"
+  },
+  "DevStats-Backend/src/main/java/devstats/http/OAuthServer.java": {
+    "mtime": 1783864753.5586019,
+    "ast_hash": "34b07bb135a0e069e09c910e8859e53f",
+    "semantic_hash": "34b07bb135a0e069e09c910e8859e53f"
+  },
+  "DevStats-Backend/src/main/java/devstats/http/WebhookHandler.java": {
+    "mtime": 1783864113.7211113,
+    "ast_hash": "ebcbd76ecf28f447d2fb1ab6c43ec2e2",
+    "semantic_hash": "ebcbd76ecf28f447d2fb1ab6c43ec2e2"
+  },
+  "DevStats-Backend/src/main/java/devstats/http/WebhookServer.java": {
+    "mtime": 1783864753.5606172,
+    "ast_hash": "7c49016c69628dbc28d5d8d410f0a3cf",
+    "semantic_hash": "7c49016c69628dbc28d5d8d410f0a3cf"
+  },
+  "DevStats-Backend/src/main/java/devstats/models/Config.java": {
+    "mtime": 1783864753.562617,
+    "ast_hash": "e2466c9ce787b86ce69e54630ec7655d",
+    "semantic_hash": "e2466c9ce787b86ce69e54630ec7655d"
+  },
+  "DevStats-Backend/src/main/java/devstats/models/DiscordTokenResponse.java": {
+    "mtime": 1783804023.3711524,
+    "ast_hash": "0e9f1f3f4ac7c183cbcd3e9d9bba9d9d",
+    "semantic_hash": "0e9f1f3f4ac7c183cbcd3e9d9bba9d9d"
+  },
+  "DevStats-Backend/src/main/java/devstats/models/DiscordUser.java": {
+    "mtime": 1783864113.72564,
+    "ast_hash": "6a3bd09107886bef6e65b4213cdb30ca",
+    "semantic_hash": "6a3bd09107886bef6e65b4213cdb30ca"
+  },
+  "DevStats-Backend/src/main/java/devstats/models/DynamicField.java": {
+    "mtime": 1783804023.3721526,
+    "ast_hash": "dd74f51ed963a1bafedbbac6e6490c99",
+    "semantic_hash": "dd74f51ed963a1bafedbbac6e6490c99"
+  },
+  "DevStats-Backend/src/main/java/devstats/models/GithubProfile.java": {
+    "mtime": 1783804023.3741534,
+    "ast_hash": "ffa602fe6db0e4980bb734f75df11e11",
+    "semantic_hash": "ffa602fe6db0e4980bb734f75df11e11"
+  },
+  "DevStats-Backend/src/main/java/devstats/models/ImageField.java": {
+    "mtime": 1783874163.075298,
+    "ast_hash": "3176ad70ac76c319e605bec6b0312c1a",
+    "semantic_hash": "3176ad70ac76c319e605bec6b0312c1a"
+  },
+  "DevStats-Backend/src/main/java/devstats/models/UserData.java": {
+    "mtime": 1783864113.727638,
+    "ast_hash": "e8ed9b8ba16b8d535a0e555af8ea79a4",
+    "semantic_hash": "e8ed9b8ba16b8d535a0e555af8ea79a4"
+  },
+  "DevStats-Backend/src/main/java/devstats/models/WidgetData.java": {
+    "mtime": 1783131749.515263,
+    "ast_hash": "664e8f62a3587cf7701b4d4d7a50da00",
+    "semantic_hash": "664e8f62a3587cf7701b4d4d7a50da00"
+  },
+  "DevStats-Backend/src/main/java/devstats/models/WidgetPayload.java": {
+    "mtime": 1783131749.5132625,
+    "ast_hash": "454fb968db0c77045b6afcab5484f69b",
+    "semantic_hash": "454fb968db0c77045b6afcab5484f69b"
+  },
+  "DevStats-Backend/src/main/java/devstats/services/AutoSyncService.java": {
+    "mtime": 1783864113.7286375,
+    "ast_hash": "110f7bd07a96197b46864b0832952660",
+    "semantic_hash": "110f7bd07a96197b46864b0832952660"
+  },
+  "DevStats-Backend/src/main/java/devstats/services/DatabaseService.java": {
+    "mtime": 1783873407.3421657,
+    "ast_hash": "e2635f54cfec4e147bd9b39aadb4fde0",
+    "semantic_hash": "e2635f54cfec4e147bd9b39aadb4fde0"
+  },
+  "DevStats-Backend/src/main/java/devstats/services/DiscordWidgetService.java": {
+    "mtime": 1783864113.7326374,
+    "ast_hash": "5bbabfba7ab7fbc5a72af8c64f01bc35",
+    "semantic_hash": "5bbabfba7ab7fbc5a72af8c64f01bc35"
+  },
+  "DevStats-Backend/src/main/java/devstats/services/GithubService.java": {
+    "mtime": 1783864113.734151,
+    "ast_hash": "ca3735967f5640672af480bdaea6ba14",
+    "semantic_hash": "ca3735967f5640672af480bdaea6ba14"
+  },
+  "DevStats-Backend/src/main/java/devstats/services/OAuthService.java": {
+    "mtime": 1783864753.5666258,
+    "ast_hash": "0918facc550886416405eef73c013e33",
+    "semantic_hash": "0918facc550886416405eef73c013e33"
+  },
+  "DevStats-Backend/src/main/java/devstats/services/WidgetSyncService.java": {
+    "mtime": 1783864113.7371633,
+    "ast_hash": "3404327c9404aeaee1f8bd2153f4090e",
+    "semantic_hash": "3404327c9404aeaee1f8bd2153f4090e"
+  },
+  "DevStats-Backend/src/main/java/devstats/utils/DateUtils.java": {
+    "mtime": 1783864113.7391617,
+    "ast_hash": "95ed3e8f8747ecf4e26d2c07391dfef7",
+    "semantic_hash": "95ed3e8f8747ecf4e26d2c07391dfef7"
+  },
+  "DevStats-Backend/src/main/java/devstats/utils/HttpUtils.java": {
+    "mtime": 1783864113.7401595,
+    "ast_hash": "1db8b8c75a2d2984c4bfc5a787aab33c",
+    "semantic_hash": "1db8b8c75a2d2984c4bfc5a787aab33c"
+  },
+  "DevStats-Backend/src/main/java/devstats/utils/JsonUtils.java": {
+    "mtime": 1783864113.742668,
+    "ast_hash": "edece309db8b9be0a16518f376a084e5",
+    "semantic_hash": "edece309db8b9be0a16518f376a084e5"
+  },
+  "DevStats-Backend/src/test/java/devstats/models/DynamicFieldTest.java": {
+    "mtime": 1783864113.8091547,
+    "ast_hash": "5f47bc90cf8e06626d605a451a213b65",
+    "semantic_hash": "5f47bc90cf8e06626d605a451a213b65"
+  },
+  "DevStats-Backend/src/test/java/devstats/models/ImageFieldTest.java": {
+    "mtime": 1783864113.8101542,
+    "ast_hash": "367c904f59cbab8932116513f416b50e",
+    "semantic_hash": "367c904f59cbab8932116513f416b50e"
+  },
+  "DevStats-Backend/src/test/java/devstats/models/UserDataTest.java": {
+    "mtime": 1783864113.816678,
+    "ast_hash": "c4cb96bb56250b94b387bfe6432ee4a3",
+    "semantic_hash": "c4cb96bb56250b94b387bfe6432ee4a3"
+  },
+  "DevStats-Backend/src/test/java/devstats/services/DatabaseServiceTest.java": {
+    "mtime": 1783864113.826771,
+    "ast_hash": "0684f0acf00cbe0c117974ea5a7a1c3f",
+    "semantic_hash": "0684f0acf00cbe0c117974ea5a7a1c3f"
+  },
+  "DevStats-Backend/src/test/java/devstats/services/GithubServiceTest.java": {
+    "mtime": 1783864113.8277721,
+    "ast_hash": "34a6a294ae95e8eb1c50d33d841b2c51",
+    "semantic_hash": "34a6a294ae95e8eb1c50d33d841b2c51"
+  },
+  "DevStats-Backend/src/test/java/devstats/utils/DateUtilsTest.java": {
+    "mtime": 1783864113.8297732,
+    "ast_hash": "5dff28b63df0a819884e28cb0a8ac0e3",
+    "semantic_hash": "5dff28b63df0a819884e28cb0a8ac0e3"
+  },
+  "DevStats-Backend/src/test/java/devstats/utils/HttpUtilsTest.java": {
+    "mtime": 1783864113.8307729,
+    "ast_hash": "a7f1dbde3e499b088ad6890a7b9a9d2d",
+    "semantic_hash": "a7f1dbde3e499b088ad6890a7b9a9d2d"
+  },
+  "DevStats-Backend/src/test/java/devstats/utils/JsonUtilsTest.java": {
+    "mtime": 1783864113.8327734,
+    "ast_hash": "4a7d69794b7beca31c96dd130b01af40",
+    "semantic_hash": "4a7d69794b7beca31c96dd130b01af40"
+  }
+}
