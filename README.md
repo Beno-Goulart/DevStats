@@ -306,7 +306,7 @@ See [ARCHITECTURE.md](./ARCHITECTURE.md) for full diagrams.
 | `WidgetSyncService` | 18 | Orchestrator |
 | `GithubService` | 16 | GitHub API client |
 
-Open [graphify-out/graph.html](./graphify-out/graph.html) for the **interactive version** — click nodes, filter by community.
+Open [graphify-out/graph.html](https://beno-goulart.github.io/DevStats/graphify-out/graph.html) for the **interactive version** — click nodes, filter by community.
 
 ## Deploy
 
