@@ -1,5 +1,6 @@
 {
   "_type": "discord_widget_config",
+  "_version": "1.0.0",
   "surfaces": {
     "widget_bottom": {
       "layout": "widget_bottom_collection",
