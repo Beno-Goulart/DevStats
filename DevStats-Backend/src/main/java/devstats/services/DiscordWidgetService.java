@@ -12,6 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -22,8 +26,6 @@ public class DiscordWidgetService {
     private static final String API = "https://discord.com/api/v10";
     private static final String CONFIG_PATH = "widget-config.json";
 
-    private static final int MAX_FIELD_LENGTH = 100;
-
     private final ObjectMapper mapper = new ObjectMapper();
     private final JsonNode widgetConfig;
 
@@ -31,24 +33,17 @@ public class DiscordWidgetService {
         this.widgetConfig = loadConfig();
     }
 
-    public void sync(GithubProfile profile) throws Exception {
-        sync(Config.USER_ID, Config.ACCESS_TOKEN, profile);
+    public void sync() throws Exception {
+        sync(Config.USER_ID, Config.ACCESS_TOKEN, null);
     }
 
     public void sync(String userId, String accessToken, GithubProfile profile) throws Exception {
         ObjectNode payload = buildPayload(profile);
-
         String json = JsonUtils.toJson(payload);
 
         log.debug("Discord payload para {}: {}", userId, json);
 
-        Map<String, String> headers = new LinkedHashMap<>();
-        headers.put("Authorization", "Bot " + Config.BOT_TOKEN);
-        if (accessToken != null && !accessToken.isBlank()) {
-            headers.put("X-Access-Token", accessToken);
-        }
-        headers.put("Content-Type", "application/json");
-        headers.put("Accept", "application/json");
+        Map<String, String> headers = buildHeaders(accessToken);
 
         try {
             String url = profileUrl(userId);
@@ -57,7 +52,7 @@ public class DiscordWidgetService {
             log.debug("Resposta Discord: {}", response);
         } catch (RuntimeException e) {
             if (e.getMessage() != null && e.getMessage().contains("40106")) {
-                log.warn("Identity já existe para outro usuário, deletando identity 0 para {}...", userId);
+                log.warn("Identity já existe, deletando identity 0 para {}...", userId);
                 deleteIdentity(userId, headers);
                 String url = profileUrl(userId);
                 String response = HttpUtils.patch(url, json, headers);
@@ -81,104 +76,61 @@ public class DiscordWidgetService {
 
     private ObjectNode buildPayload(GithubProfile profile) {
         ObjectNode payload = mapper.createObjectNode();
-        payload.put("username", truncate(profile.getUsername()));
+        payload.put("username", profile != null ? profile.getUsername() : "");
 
-        if (widgetConfig != null) {
-            ObjectNode data = buildDataNode(profile);
-            payload.set("data", data);
+        ObjectNode data = mapper.createObjectNode();
+        ArrayNode dynamic = mapper.createArrayNode();
 
-            if (widgetConfig.has("surfaces")) {
-                payload.set("surfaces", widgetConfig.get("surfaces"));
-            }
-        } else {
-            log.warn("Widget config não encontrado, usando payload flat");
-            payload.set("data", buildFlatPayload(profile));
+        if (profile != null) {
+            addTextField(dynamic, "full_name", profile.getFullName());
+            addTextField(dynamic, "bio", profile.getBio());
+            addImageField(dynamic, "profile_img", profile.getAvatarUrl());
+            addTextField(dynamic, "language", profile.getMainLanguage());
+            addTextField(dynamic, "active", String.valueOf(profile.getActiveRepos()));
+            addTextField(dynamic, "commits_today", String.valueOf(profile.getCommitsToday()));
+            addTextField(dynamic, "last_commit", profile.getLastCommit());
+            addTextField(dynamic, "last_repo", profile.getLastRepository());
+        }
+
+        data.set("dynamic", dynamic);
+        payload.set("data", data);
+
+        if (widgetConfig != null && widgetConfig.has("surfaces")) {
+            payload.set("surfaces", widgetConfig.get("surfaces"));
         }
 
         return payload;
     }
 
-    private ObjectNode buildDataNode(GithubProfile profile) {
-        ObjectNode data = mapper.createObjectNode();
-
-        data.put("full_name", truncate(profile.getFullName()));
-        data.put("bio", truncate(profile.getBio()));
-        data.put("language", truncate(profile.getMainLanguage()));
-        data.put("active", String.valueOf(profile.getActiveRepos()));
-        data.put("last_repo", truncate(profile.getLastRepository()));
-        data.put("last_commit", truncate(profile.getLastCommit()));
-        data.put("commits_today", String.valueOf(profile.getCommitsToday()));
-
-        if (profile.getAvatarUrl() != null && !profile.getAvatarUrl().isBlank()) {
-            ObjectNode avatarObj = mapper.createObjectNode();
-            avatarObj.put("url", profile.getAvatarUrl());
-            data.set("profile_img", avatarObj);
-        }
-
-        ArrayNode dynamic = mapper.createArrayNode();
-        dynamic.add(dynamicField("full_name", profile.getFullName()));
-        dynamic.add(dynamicField("bio", profile.getBio()));
-        dynamic.add(dynamicField("language", profile.getMainLanguage()));
-        dynamic.add(dynamicField("active", String.valueOf(profile.getActiveRepos())));
-        dynamic.add(dynamicField("last_repo", profile.getLastRepository()));
-        dynamic.add(dynamicField("last_commit", profile.getLastCommit()));
-        dynamic.add(dynamicField("commits_today", String.valueOf(profile.getCommitsToday())));
-        if (profile.getAvatarUrl() != null && !profile.getAvatarUrl().isBlank()) {
-            ObjectNode imgField = mapper.createObjectNode();
-            imgField.put("type", 3);
-            imgField.put("name", "profile_img");
-            ObjectNode imgValue = mapper.createObjectNode();
-            imgValue.put("url", profile.getAvatarUrl());
-            imgField.set("value", imgValue);
-            dynamic.add(imgField);
-        }
-        data.set("dynamic", dynamic);
-
-        return data;
-    }
-
-    private ObjectNode buildFlatPayload(GithubProfile profile) {
-        ArrayNode dynamic = mapper.createArrayNode();
-
-        dynamic.add(dynamicField("full_name", profile.getFullName()));
-        dynamic.add(dynamicField("bio", profile.getBio()));
-        dynamic.add(dynamicField("language", profile.getMainLanguage()));
-        dynamic.add(dynamicField("active", String.valueOf(profile.getActiveRepos())));
-        dynamic.add(dynamicField("last_repo", profile.getLastRepository()));
-        dynamic.add(dynamicField("last_commit", profile.getLastCommit()));
-        dynamic.add(dynamicField("commits_today", String.valueOf(profile.getCommitsToday())));
-
-        if (profile.getAvatarUrl() != null && !profile.getAvatarUrl().isBlank()) {
-            ObjectNode imgField = mapper.createObjectNode();
-            imgField.put("type", 3);
-            imgField.put("name", "profile_img");
-            ObjectNode imgValue = mapper.createObjectNode();
-            imgValue.put("url", profile.getAvatarUrl());
-            imgField.set("value", imgValue);
-            dynamic.add(imgField);
-        }
-
-        ObjectNode data = mapper.createObjectNode();
-        data.set("dynamic", dynamic);
-        return data;
-    }
-
-    private ObjectNode dynamicField(String name, String value) {
+    private void addTextField(ArrayNode dynamic, String name, String value) {
+        if (value == null || value.isBlank()) return;
         ObjectNode field = mapper.createObjectNode();
         field.put("type", 1);
         field.put("name", name);
-        field.put("value", truncate(value));
-        return field;
+        field.put("value", value);
+        dynamic.add(field);
     }
 
-    private String truncate(String value) {
-        if (value == null || value.isBlank()) {
-            return "";
+    private void addImageField(ArrayNode dynamic, String name, String url) {
+        if (url == null || url.isBlank()) return;
+        ObjectNode field = mapper.createObjectNode();
+        field.put("type", 3);
+        field.put("name", name);
+        ObjectNode value = mapper.createObjectNode();
+        value.put("url", url);
+        field.set("value", value);
+        dynamic.add(field);
+    }
+
+    private Map<String, String> buildHeaders(String accessToken) {
+        Map<String, String> headers = new LinkedHashMap<>();
+        headers.put("Authorization", "Bot " + Config.BOT_TOKEN);
+        if (accessToken != null && !accessToken.isBlank()) {
+            headers.put("X-Access-Token", accessToken);
         }
-        if (value.length() > MAX_FIELD_LENGTH) {
-            return value.substring(0, MAX_FIELD_LENGTH);
-        }
-        return value;
+        headers.put("Content-Type", "application/json");
+        headers.put("Accept", "application/json");
+        return headers;
     }
 
     private JsonNode loadConfig() {
@@ -190,7 +142,7 @@ public class DiscordWidgetService {
             }
             try (is) {
                 JsonNode config = mapper.readTree(is);
-                log.info("Widget config carregado com {} surfaces", config.get("surfaces").size());
+                log.info("Widget config carregado: {} surfaces", config.get("surfaces").size());
                 return config;
             }
         } catch (Exception e) {

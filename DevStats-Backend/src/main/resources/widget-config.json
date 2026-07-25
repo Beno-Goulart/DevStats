@@ -1,6 +1,5 @@
 {
   "_type": "discord_widget_config",
-  "_version": "1.0.0",
   "surfaces": {
     "widget_bottom": {
       "layout": "widget_bottom_collection",
@@ -8,96 +7,76 @@
         "item_1": {
           "fields": {
             "description": {
-              "value_type": "data",
+              "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "active",
-              "fallback": {
-                "value_type": "custom_string",
-                "presentation_type": "text",
-                "value": "No active repositories"
-              }
+              "value": "Depends on Teammates™"
             },
             "image": {
               "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "furnace"
+              "value": "trophy"
             },
             "name": {
               "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "Active Repositories:"
+              "value": "Win Rate"
             }
           }
         },
         "item_2": {
           "fields": {
             "description": {
-              "value_type": "data",
+              "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "commits_today",
-              "fallback": {
-                "value_type": "custom_string",
-                "presentation_type": "text",
-                "value": "Nothing yet"
-              }
+              "value": "Working as Intended"
             },
             "image": {
               "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "craft"
+              "value": "explosion"
             },
             "name": {
               "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "Commits Today:"
+              "value": "Missed Ultimates"
             }
           }
         },
         "item_3": {
           "fields": {
             "description": {
-              "value_type": "data",
+              "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "last_repo",
-              "fallback": {
-                "value_type": "custom_string",
-                "presentation_type": "text",
-                "value": "Unknown"
-              }
+              "value": "999"
             },
             "image": {
               "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "chest"
+              "value": "warning"
             },
             "name": {
               "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "Last Repositorie:"
+              "value": "C9 Counter"
             }
           }
         },
         "item_4": {
           "fields": {
             "description": {
-              "value_type": "data",
+              "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "last_commit",
-              "fallback": {
-                "value_type": "custom_string",
-                "presentation_type": "text",
-                "value": "No recent commits"
-              }
+              "value": "Accidental"
             },
             "image": {
               "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "Clock_JE3_BE3"
+              "value": "crosshair"
             },
             "name": {
               "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "Last Commit"
+              "value": "Headshots"
             }
           }
         }
@@ -109,38 +88,28 @@
         "stat": {
           "fields": {
             "text": {
-              "value_type": "data",
+              "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "last_commit",
-              "fallback": {
-                "value_type": "custom_string",
-                "presentation_type": "text",
-                "value": "No recent commits"
-              }
+              "value": "\"My supports are trolling.\""
             },
             "icon": {
               "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "Clock_JE3_BE3"
+              "value": "warning"
             },
             "label": {
               "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "Last Commit"
+              "value": "Current Excuse"
             }
           }
         },
         "hero_image": {
           "fields": {
             "image": {
-              "value_type": "data",
+              "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "profile_img",
-              "fallback": {
-                "value_type": "application_asset",
-                "presentation_type": "image",
-                "value": "Reach-GIF"
-              }
+              "value": "streamer"
             }
           }
         }
@@ -152,71 +121,46 @@
         "title": {
           "fields": {
             "text": {
-              "value_type": "data",
+              "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "full_name",
-              "fallback": {
-                "value_type": "custom_string",
-                "presentation_type": "text",
-                "value": "GitHub User"
-              }
+              "value": "Professional Thrower"
             }
           }
         },
         "subtitle_1": {
           "fields": {
             "text": {
-              "value_type": "data",
+              "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "bio",
-              "fallback": {
-                "value_type": "custom_string",
-                "presentation_type": "text",
-                "value": "Code-> Commit-> Repeat"
-              }
+              "value": "Top 500 Excuse Generator"
             },
             "icon": {
               "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "favicon__1_"
+              "value": "overwatch"
             }
           }
         },
         "hero_image": {
           "fields": {
             "image": {
-              "value_type": "data",
+              "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "profile_img",
-              "fallback": {
-                "value_type": "application_asset",
-                "presentation_type": "image",
-                "value": "Reach-GIF"
-              }
+              "value": "streamer"
             }
           }
         },
         "subtitle_2": {
           "fields": {
             "text": {
-              "value_type": "data",
+              "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "language",
-              "fallback": {
-                "value_type": "custom_string",
-                "presentation_type": "text",
-                "value": "Code-> Commit-> Repeat"
-              }
+              "value": "Definitely not my fault"
             },
             "icon": {
-              "value_type": "data",
+              "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "language_icon",
-              "fallback": {
-                "value_type": "application_asset",
-                "presentation_type": "image",
-                "value": "pixel-art-retro-computer"
-              }
+              "value": "controller"
             }
           }
         }
@@ -230,7 +174,7 @@
             "image": {
               "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "Reach-GIF"
+              "value": "streamer"
             }
           }
         }
@@ -242,29 +186,19 @@
         "stat": {
           "fields": {
             "text": {
-              "value_type": "data",
+              "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "last_commit",
-              "fallback": {
-                "value_type": "custom_string",
-                "presentation_type": "text",
-                "value": "No recent commits"
-              }
+              "value": "Blaming Matchmaking"
             },
             "icon": {
-              "value_type": "data",
+              "value_type": "application_asset",
               "presentation_type": "image",
-              "value": "profile_img",
-              "fallback": {
-                "value_type": "application_asset",
-                "presentation_type": "image",
-                "value": "Reach-GIF"
-              }
+              "value": "warning"
             },
             "label": {
               "value_type": "custom_string",
               "presentation_type": "text",
-              "value": "Last Commit"
+              "value": "Current Mood"
             }
           }
         }

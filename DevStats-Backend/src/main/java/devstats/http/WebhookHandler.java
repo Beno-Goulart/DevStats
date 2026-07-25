@@ -111,7 +111,7 @@ public class WebhookHandler implements HttpHandler {
                 accessToken = tokenResponse.getAccessToken();
             }
 
-            widgetSyncService.sync(user.getGithubUsername(), user.getDiscordId(), accessToken);
+            widgetSyncService.sync(user.getDiscordId(), accessToken);
             databaseService.updateLastSync(user.getDiscordId(), System.currentTimeMillis());
 
             log.info("Widget sincronizado via webhook para {}", user.getDiscordId());

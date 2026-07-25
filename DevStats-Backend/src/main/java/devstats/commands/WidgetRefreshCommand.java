@@ -37,7 +37,7 @@ public class WidgetRefreshCommand {
         }
 
         if (user.getGithubUsername() == null || user.getGithubUsername().isBlank()) {
-            event.reply("Você precisa definir seu GitHub com /widget github <username>.")
+            event.reply("Você precisa configurar sua conta primeiro.")
                     .setEphemeral(true)
                     .queue();
             return;
@@ -48,9 +48,8 @@ public class WidgetRefreshCommand {
                 .queue(hook -> CompletableFuture.runAsync(() -> {
                     try {
                         String accessToken = ensureValidToken(user, discordId);
-                        String githubUsername = user.getGithubUsername();
 
-                        widgetSyncService.sync(githubUsername, discordId, accessToken);
+                        widgetSyncService.sync(discordId, accessToken, user.getGithubUsername());
 
                         databaseService.updateLastSync(discordId, System.currentTimeMillis());
 

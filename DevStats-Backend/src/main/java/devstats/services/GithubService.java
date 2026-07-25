@@ -112,6 +112,7 @@ public class GithubService {
 
         profile.setLastRepository(textField(latestRepository, "name"));
         loadCommits(profile, latestRepository);
+        loadAllCommitsToday(profile, githubUsername);
     }
 
     private void addRepositoryLanguages(JsonNode repository, Map<String, Long> languageBytes) throws Exception {
@@ -143,19 +144,40 @@ public class GithubService {
             return;
         }
 
-        int commitsToday = 0;
-        var startOfDay = DateUtils.startOfTodayUtc();
-
-        for (JsonNode commit : commits) {
-            String dateStr = commit.path("commit").path("author").path("date").asText("");
-            if (DateUtils.isAfter(dateStr, startOfDay)) {
-                commitsToday++;
-            }
-        }
-
         JsonNode latestCommit = commits.get(0);
         String message = textField(latestCommit.path("commit"), "message");
         profile.setLastCommit(message.isBlank() ? textField(latestCommit, "sha") : message);
+    }
+
+    private void loadAllCommitsToday(GithubProfile profile, String githubUsername) throws Exception {
+        String path = (Config.GITHUB_TOKEN != null && !Config.GITHUB_TOKEN.isBlank())
+                ? "/user/events?per_page=100"
+                : "/users/" + encodePathSegment(githubUsername) + "/events?per_page=100";
+
+        JsonNode events = fetchJson(path);
+
+        int commitsToday = 0;
+        var startOfDay = DateUtils.startOfTodayUtc();
+
+        if (events.isArray()) {
+            for (JsonNode event : events) {
+                if (!"PushEvent".equals(textField(event, "type"))) {
+                    continue;
+                }
+
+                String createdAt = textField(event, "created_at");
+                if (!DateUtils.isAfter(createdAt, startOfDay)) {
+                    continue;
+                }
+
+                JsonNode payload = event.path("payload");
+                JsonNode commitList = payload.path("commits");
+                if (commitList.isArray()) {
+                    commitsToday += commitList.size();
+                }
+            }
+        }
+
         profile.setCommitsToday(commitsToday);
     }
 

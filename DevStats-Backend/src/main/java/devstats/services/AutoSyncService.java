@@ -49,7 +49,7 @@ public class AutoSyncService {
 
                 try {
                     String accessToken = ensureValidToken(user);
-                    widgetSyncService.sync(user.getGithubUsername(), user.getDiscordId(), accessToken);
+                    widgetSyncService.sync(user.getDiscordId(), accessToken, user.getGithubUsername());
                     databaseService.updateLastSync(user.getDiscordId(), System.currentTimeMillis());
                     synced++;
                 } catch (Exception e) {
